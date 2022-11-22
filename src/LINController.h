@@ -28,24 +28,27 @@ public:
     explicit LINController(HardwareSerial* ser, unsigned long baud) {
         this->ser = ser;
         this->baud = baud;
+
+        // open serial connection
+        ser->begin(19200);
     }
 
     void send(byte ident, byte data[], byte data_size) {
-        Serial.print("sending data at ");
-        Serial.println(millis());
-        byte chksm = this->getChecksum(ident, data, data_size);
+        Serial.print(millis());
+        Serial.println(" sending data");
+        byte chksm = LINController::getChecksum(ident, data, data_size);
         writeLinBreak();
         ser->write(0x55);
         ser->write(ident);
         for(int i=0;i<data_size;i++) ser->write(data[i]);
         ser->write(chksm);
         ser->flush();
-        delay(10);
+//        delay(10);
     }
 
     void request(byte lin_id) {
-        Serial.print("requesting data at ");
-        Serial.println(millis());
+        Serial.print(millis());
+        Serial.println(" requesting data");
         writeLinBreak();
         ser->write(0x55);
         ser->write(lin_id);
