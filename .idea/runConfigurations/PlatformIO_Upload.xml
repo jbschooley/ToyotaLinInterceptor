@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PlatformIO Upload" type="platformio" factoryName="PlatformIO Upload" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ToyotaLinInterceptor" TARGET_NAME="Production" CONFIG_NAME="megaatmega2560" RUN_TARGET_PROJECT_NAME="ToyotaLinInterceptor" RUN_TARGET_NAME="Production">
+    <method v="2" />
+  </configuration>
+</component>

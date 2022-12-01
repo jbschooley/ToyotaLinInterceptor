@@ -11,13 +11,15 @@ private:
     LINController* LINPanel;
     unsigned long lastMillis = 0;
 
+    byte currFrame[10];
+
 public:
     byte dataB1status[8] = {0x00, 0x06, 0x14, 0x00, 0x34, 0x37, 0x00, 0xc1};
     byte data32[8] = {0x00, 0x00, 0x00, 0x00, 0x38, 0x38, 0x00, 0x10};
     byte dataF5[8] = {0x00, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00};
 
     explicit PanelHandler(HardwareSerial* ser) {
-        LINPanel = new LINController(ser, 19200);
+        LINPanel = new LINController(ser, 19200, currFrame, specs);
     }
 
     void sendEvery10ms() {
@@ -28,7 +30,6 @@ public:
     }
 
     void sendNext() {
-
         switch (this->nextMsg) {
             case 0xb1:
                 LINPanel->send(0xb1, dataB1status, 8);
@@ -64,7 +65,89 @@ public:
                 break;
         }
 
+        handleRead();
+
     }
+
+    static void specs(byte* idByte, uint8_t* currFrameSize, bool* isRequest) {
+        switch (*idByte) {
+            case 0xb1:
+            case 0x32:
+            case 0x39:
+            case 0xba:
+            case 0xf5:
+            case 0x78:
+//                *currFrameSize = 8;
+                *isRequest = false;
+                break;
+            case 0x76:
+//                *currFrameSize = 1;
+                *isRequest = true;
+                break;
+        }
+    }
+
+    void handleRead() {
+        while (LINPanel->available()) {
+            if (LINPanel->processRead()) {
+                Serial.print(" [");
+                for (int i=0; i<10; i++) {
+                    Serial.print(currFrame[i], HEX);
+                    if (i < 10-1) Serial.print(' ');
+                }
+                Serial.print("]");
+            }
+        }
+    }
+
+//    void handleRead() {
+//        while (LINPanel->available()) {
+//            byte currByte = LINPanel->read();
+//
+//            if (isInsideFrame) {
+//                if (currFramePos == 0) { // ID
+//                    switch (currByte) {
+//                        case 0x76:
+//                            currFrameSize = 2;
+//                            break;
+//                        case 0xb1:
+//                        case 0x32:
+//                        case 0x39:
+//                        case 0xba:
+//                        case 0xf5:
+//                        case 0x78:
+//                        default:
+//                            currFrameSize = 8;
+//                            break;
+//                    }
+//                }
+//                if (currFramePos < currFrameSize+2) {  // 2 extra for ID and checksum
+//                    currFrame[currFramePos] = currByte;
+//                    currFramePos++;
+//                } else {
+//                    handleFrame();
+//                    // reset
+//                    isInsideFrame = false;
+//                    currFramePos = 0;
+//                }
+//            } else {
+//                if (currByte == 0x55) {
+//                    isInsideFrame = true;
+//                }
+//            }
+//        }
+//
+//    }
+//
+//    void handleFrame() {
+////        Serial.print(" " + currFrameStr);
+//        Serial.print(" [");
+//        for (int i=0; i<currFrameSize+2; i++) {
+//            Serial.print(currFrame[i], HEX);
+//            if (i < currFrameSize+1) Serial.print(' ');
+//        }
+//        Serial.print("]");
+//    }
 };
 
 

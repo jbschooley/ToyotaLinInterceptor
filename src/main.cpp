@@ -17,10 +17,6 @@ Timer<10> timer;
 //LINController LINPanel(&SerialPanel, 19200);
 PanelHandler panelHandler(&SerialPanel);
 
-void processRead() {
-
-}
-
 //void writeToPanel() {
 //    byte dataB1status[8] = {0x00, 0x06, 0x14, 0x00, 0x34, 0x37, 0x00, 0xc1};
 //    LINPanel.send(0xb1, dataB1status, 8);
