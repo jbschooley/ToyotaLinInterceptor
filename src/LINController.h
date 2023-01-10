@@ -8,7 +8,6 @@
 
 class LINController {
 private:
-    HardwareSerial* ser;
     unsigned long baud;
 
     byte currFrame[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -20,7 +19,7 @@ private:
     void (*funcProcessReadId)(byte*, uint8_t*, bool*);
     byte* returnFrame;
 
-    size_t writeBreak() {
+    size_t writeBreak() const {
         ser->flush();
         // configure to half baudrate --> a t_bit will be doubled
         ser->begin(baud >> 1);
@@ -34,7 +33,9 @@ private:
         return ret;
     }
 public:
-    explicit LINController(
+    HardwareSerial* ser;
+
+    LINController(
             HardwareSerial* ser,
             unsigned long baud,
             byte* returnFrame,
@@ -48,8 +49,67 @@ public:
         ser->begin(19200);
     }
 
-    int available() {
+    int available() const {
         return ser->available();
+    }
+
+    void printCurrentFrame() {
+        Serial.print(" [");
+        for (int i=0; i<currFrameSize+2; i++) {
+            Serial.print(currFrame[i], HEX);
+            if (i < currFrameSize+1) Serial.print(' ');
+        }
+        Serial.print("]");
+    }
+
+    void handleFrameSlave() {
+//        printCurrentFrame();
+
+        uint8_t frameSizeToReturn = currFrameSize + 2;
+        returnFrame[0] = currFrameSize==8 ? 0 : 1;
+
+        for (int i=0; i<frameSizeToReturn; i++) {
+            returnFrame[i+1] = currFrame[i];
+        }
+    }
+
+    bool processReadSlave() {
+        while (ser->available()) {
+            byte currByte = ser->read();
+            if (isInsideFrame) {
+                if (currFramePos == 0) { // ID
+                    switch (currByte) {
+                        case 0xb1:
+                        case 0x32:
+                        case 0xf5:
+                            currFrameSize = 8;
+                            break;
+                        case 0x76:
+                        case 0x39:
+                        case 0xba:
+                        case 0x78:
+                            currFrameSize = 0;
+                            break;
+                    }
+                }
+
+                if (currFramePos < currFrameSize+2) {
+                    currFrame[currFramePos] = currByte;
+                    currFramePos++;
+                } else {
+                    handleFrameSlave();
+                    isInsideFrame = false;
+                    currFramePos = 0;
+                    return true;
+                }
+            } else {
+                if (currByte == 0x55) {
+                    isInsideFrame = true;
+                    currFramePos = 0;
+                }
+            }
+        }
+        return false;
     }
 
     bool processRead() {
@@ -63,11 +123,13 @@ public:
                     funcProcessReadId(&currByte, &currFrameSize, &isRequest);
                 }
 
-                if (isRequest) {
-                    currFrame[currFramePos] = currByte;
-                    return handleFrame();
-                    resetFrame();
-                } else if (currFramePos < currFrameSize+2) {  // 2 extra for ID and checksum
+//                if (isRequest) {
+//                    currFrame[currFramePos] = currByte;
+//                    Serial.print("EXPECTING RESPONSE HERE");
+//                    return handleFrame();
+//                    resetFrame();
+//                } else
+                    if (currFramePos < currFrameSize+2) {  // 2 extra for ID and checksum
                     currFrame[currFramePos] = currByte;
                     currFramePos++;
                 } else {
@@ -100,7 +162,7 @@ public:
         uint8_t frameSizeToReturn = currFrameSize + 1;
         if (isRequest) {
             returnFrame[0] = 1;
-            frameSizeToReturn = 1;
+            frameSizeToReturn = 9;
         } else {
             returnFrame[0] = 0;
             // verify checksum
@@ -129,7 +191,8 @@ public:
     void send(byte ident, byte data[], byte data_size) {
         Serial.println();
         Serial.print(millis());
-        Serial.print(" sending data");
+        Serial.print(" sending data ");
+        Serial.print(ident, HEX);
         byte chksm = LINController::getChecksum(&ident, data, data_size);
         writeBreak();
         ser->write(0x55);
@@ -137,14 +200,24 @@ public:
         for(int i=0;i<data_size;i++) ser->write(data[i]);
         ser->write(chksm);
         ser->flush();
-//        processRead();
-//        delay(10);
+    }
+
+    void sendResponse(byte ident, byte data[], byte data_size) {
+        Serial.println();
+        Serial.print(millis());
+        Serial.print(" sending response ");
+        Serial.print(ident, HEX);
+        byte chksm = LINController::getChecksum(&ident, data, data_size);
+        for(int i=0;i<data_size;i++) ser->write(data[i]);
+        ser->write(chksm);
+        ser->flush();
     }
 
     void request(byte lin_id) {
         Serial.println();
         Serial.print(millis());
-        Serial.print(" request data");
+        Serial.print(" request data ");
+        Serial.print(lin_id, HEX);
         writeBreak();
         ser->write(0x55);
         ser->write(lin_id);
