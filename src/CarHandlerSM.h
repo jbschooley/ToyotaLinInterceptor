@@ -21,16 +21,18 @@ enum CarState {
 
 class CarHandlerSM {
 private:
+    Logger* l;
     DataStore* ds;
-    CarState state = IDLE;
     HardwareSerial* ser;
+    CarState state = IDLE;
 
     // current frame
-    uint8_t currID{};
+    uint8_t currID = 0;
     uint8_t currFrame[8]{};
 
 public:
     explicit CarHandlerSM(DataStore* ds, HardwareSerial* ser) {
+        this->l = new Logger("Car");
         this->ds = ds;
         this->ser = ser;
     }
@@ -55,10 +57,10 @@ public:
                 } else if (DataStore::idIsRequest(this->currID)) {
                     // if request, send response and go back to idle
                     // TODO: send response, including override if necessary
-                    this->state = IDLE;
+                    this->reset();
                 } else {
                     // if neither, go back to idle
-                    this->state = IDLE;
+                    this->reset();
                 }
                 break;
             case WAIT_BYTE_0:
@@ -94,15 +96,28 @@ public:
                 this->state = WAIT_CHECKSUM;
                 break;
             case WAIT_CHECKSUM:
-                // TODO: verify checksum
+                uint8_t calculatedChecksum = LINUtils::getChecksum(&this->currID, this->currFrame);
                 // if checksum is good, save frame to data store
-                if (true) {
+                if (calculatedChecksum == *b) {
                     // this is reached after frame has been received and verified
+                    // print frame to serial
+                    this->l->log(
+                            "Received frame ID "
+                            + String(this->currID, HEX)
+                            + " - "
+                            + DataStore::frameToString(this->currFrame)
+                            + " - "
+                            + String(calculatedChecksum, HEX)
+                            );
                     ds->saveFrame(this->currID, this->currFrame);
                 }
-                this->state = IDLE;
+                this->reset();
                 break;
         }
+    }
+
+    void reset() {
+        this->state = IDLE;
     }
 };
 

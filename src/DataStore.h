@@ -19,14 +19,6 @@ public:
 
     DataStore() {}
 
-    static bool idIsData(uint8_t id) {
-        return id == 0xb1 || id == 0x32 || id == 0xf5;
-    }
-
-    static bool idIsRequest(uint8_t id) {
-        return id == 0x39 || id == 0xba || id == 0x76;
-    }
-
     void saveFrame(uint8_t id, uint8_t* frame) {
         // write to data store
         switch (id) {
@@ -58,6 +50,23 @@ public:
             default:
                 break;
         }
+    }
+
+    static bool idIsData(uint8_t id) {
+        return id == 0xb1 || id == 0x32 || id == 0xf5;
+    }
+
+    static bool idIsRequest(uint8_t id) {
+        return id == 0x39 || id == 0xba || id == 0x76;
+    }
+
+    static String frameToString(uint8_t* frame) {
+        String s = "";
+        for (int i = 0; i < 8; i++) {
+            s += String(frame[i], HEX);
+            s += " ";
+        }
+        return s;
     }
 };
 
