@@ -7,6 +7,8 @@
 //#include "CarHandler2.h"
 #include "CarHandler3.h"
 //#include "Handler.h"
+#include "DataStore.h"
+#include "CarHandlerSM.h"
 
 #define SerialUSB Serial
 #define SerialCar Serial1
@@ -19,6 +21,9 @@ unsigned long baud = 19200;
 
 PanelHandler* panelHandler;
 CarHandler3* carHandler;
+
+DataStore* ds;
+CarHandlerSM* carHandlerSM;
 
 Timer<10> timer;
 //LINController LINPanel(&SerialPanel, 19200);
@@ -67,6 +72,9 @@ void setup() {
 
 //    panelHandler.sendNext();
 //    timer.every(10, panelHandler.sendNext)
+
+    ds = new DataStore();
+    carHandlerSM = new CarHandlerSM(ds);
 }
 
 bool testPanelChanged = false;
