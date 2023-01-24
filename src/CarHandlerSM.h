@@ -26,12 +26,13 @@ private:
     HardwareSerial* ser;
 
     // current frame
-    uint8_t currID;
-    uint8_t currFrame[8];
+    uint8_t currID{};
+    uint8_t currFrame[8]{};
 
 public:
-    explicit CarHandlerSM(DataStore* ds) {
+    explicit CarHandlerSM(DataStore* ds, HardwareSerial* ser) {
         this->ds = ds;
+        this->ser = ser;
     }
 
     void handleRead() {
@@ -41,10 +42,10 @@ public:
         }
     }
 
-    void handleByte(uint8_t* b) {
+    void handleByte(const uint8_t* b) {
         switch (this->state) {
             case IDLE:
-                this->state = WAIT_ID;
+                if (*b == 0x55) this->state = WAIT_ID;
                 break;
             case WAIT_ID:
                 this->currID = *b;
