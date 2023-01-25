@@ -5,8 +5,6 @@
 #ifndef TOYOTALININTERCEPTOR_DATASTORE_H
 #define TOYOTALININTERCEPTOR_DATASTORE_H
 
-#include "Logger.h"
-
 class DataStore {
 private:
     Logger* l;

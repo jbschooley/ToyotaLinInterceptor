@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include "LINUtils.h"
-#include "DataStore.h"
 #include "Logger.h"
+#include "DataStore.h"
+#include "Modifier.h"
 #include "CarHandlerSM.h"
 #include "PanelHandlerSM.h"
 
@@ -17,6 +18,7 @@ unsigned long baud = 19200;
 
 Logger* l;
 DataStore* ds;
+Modifier* mod;
 CarHandlerSM* carHandlerSM;
 PanelHandlerSM* panelHandlerSM;
 
@@ -28,8 +30,9 @@ void setup() {
     // initialize logger, data store, handlers
     l = new Logger("main");
     ds = new DataStore();
-    carHandlerSM = new CarHandlerSM(ds, &SerialCar);
-    panelHandlerSM = new PanelHandlerSM(ds, &SerialPanel);
+    mod = new Modifier(ds);
+    carHandlerSM = new CarHandlerSM(ds, mod, &SerialCar);
+    panelHandlerSM = new PanelHandlerSM(ds, mod, &SerialPanel);
 
     // enable lin chips
     pinMode(PinEnPanel, OUTPUT);

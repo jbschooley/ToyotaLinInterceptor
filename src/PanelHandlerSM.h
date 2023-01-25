@@ -23,6 +23,7 @@ private:
 
     Logger* l;
     DataStore* ds;
+    Modifier* mod;
     HardwareSerial* ser;
     PanelState state = IDLE;
 
@@ -35,9 +36,10 @@ private:
     unsigned long lastMillis = 0;
 
 public:
-    explicit PanelHandlerSM(DataStore* ds, HardwareSerial* ser) {
+    explicit PanelHandlerSM(DataStore* ds, Modifier* mod, HardwareSerial* ser) {
         this->l = new Logger("Panel", false);
         this->ds = ds;
+        this->mod = mod;
         this->ser = ser;
         ser->begin(19200);
     }

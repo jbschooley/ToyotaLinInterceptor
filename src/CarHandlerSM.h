@@ -5,8 +5,6 @@
 #ifndef TOYOTALININTERCEPTOR_CARHANDLERSM_H
 #define TOYOTALININTERCEPTOR_CARHANDLERSM_H
 
-
-
 class CarHandlerSM {
 private:
     enum CarState {
@@ -25,6 +23,7 @@ private:
 
     Logger* l;
     DataStore* ds;
+    Modifier* mod;
     HardwareSerial* ser;
     CarState state = IDLE;
 
@@ -33,9 +32,10 @@ private:
     uint8_t currFrame[8]{};
 
 public:
-    explicit CarHandlerSM(DataStore* ds, HardwareSerial* ser) {
+    explicit CarHandlerSM(DataStore* ds, Modifier* mod, HardwareSerial* ser) {
         this->l = new Logger("Car", false);
         this->ds = ds;
+        this->mod = mod;
         this->ser = ser;
         ser->begin(19200);
     }
@@ -62,6 +62,7 @@ public:
                 } else if (DataStore::idIsRequest(this->currID)) {
                     // if request, send response and go back to idle
                     // TODO modify buttons at send?
+                    mod->testButtons();
                     l->log(
                             "received request: "
                             + String(this->currID, HEX)
