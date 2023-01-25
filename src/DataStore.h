@@ -5,10 +5,15 @@
 #ifndef TOYOTALININTERCEPTOR_DATASTORE_H
 #define TOYOTALININTERCEPTOR_DATASTORE_H
 
+#include "Logger.h"
+
 class DataStore {
+private:
+    Logger* l;
 public:
     // data
-    uint8_t xB1[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // status
+//    uint8_t xB1[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // status
+    uint8_t xB1[8] = {0x00, 0x06, 0x14, 0x00, 0x34, 0x37, 0x00, 0xc1}; // status
     uint8_t x32[8] = {0x00, 0x00, 0x00, 0x00, 0x38, 0x38, 0x00, 0x10};
     uint8_t xF5[8] = {0x00, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00};
     // requests
@@ -17,35 +22,35 @@ public:
     uint8_t x76[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // unused as nothing responds to this
     uint8_t x78[8] = {0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-    DataStore() {}
+    DataStore() {
+        this->l = new Logger("DataStore", false);
+    }
 
     void saveFrame(uint8_t id, uint8_t* frame) {
         // write to data store
-//        memcpy(frame, getFrame(id), 8);
         switch (id) {
             case 0xB1:
-                memcpy(frame, this->xB1, 8);
+//                l->log("SAVING B1 " + DataStore::frameToString(frame) + " to memloc " + String((int)this->getFrame(id), HEX));
+                memcpy(this->xB1, frame, 8);
+//                l->log("SAVED B1  " + DataStore::frameToString(this->xB1) + " to memloc " + String((int)this->xB1, HEX));
                 break;
             case 0x32:
-                memcpy(frame, this->x32, 8);
+                memcpy(this->x32, frame, 8);
                 break;
             case 0xF5:
-                memcpy(frame, this->xF5, 8);
+                memcpy(this->xF5, frame, 8);
                 break;
             case 0x39:
-                memcpy(frame, this->x39, 8);
-                // TODO monitor button presses for defrost enable
-                // if button pressed and is disabled in status, store enable in eeprom
-                // if button pressed and is enabled in status, store disable in eeprom
+                memcpy(this->x39, frame, 8);
                 break;
             case 0xBA:
-                memcpy(frame, this->xBA, 8);
+                memcpy(this->xBA, frame, 8);
                 break;
             case 0x76:
-                memcpy(frame, this->x76, 8);
+                memcpy(this->x76, frame, 8);
                 break;
             case 0x78:
-                memcpy(frame, this->x78, 8);
+                memcpy(this->x78, frame, 8);
                 break;
             default:
                 break;
@@ -54,24 +59,51 @@ public:
 
     uint8_t* getFrame(uint8_t id) {
         // read from data store
+//        l->log("get datastore memloc " + String((int)this, HEX));
+        uint8_t* frame = nullptr;
+//        switch (id) {
+//            case 0xB1:
+//                return this->xB1;
+//            case 0x32:
+//                return this->x32;
+//            case 0xF5:
+//                return this->xF5;
+//            case 0x39:
+//                return this->x39;
+//            case 0xBA:
+//                return this->xBA;
+//            case 0x76:
+//                return this->x76;
+//            case 0x78:
+//                return this->x78;
+//            default:
+//                return nullptr;
+//        }
         switch (id) {
             case 0xB1:
-                return this->xB1;
+                frame = this->xB1;
+                break;
             case 0x32:
-                return this->x32;
+                frame = this->x32;
+                break;
             case 0xF5:
-                return this->xF5;
+                frame = this->xF5;
+                break;
             case 0x39:
-                return this->x39;
+                frame = this->x39;
+                break;
             case 0xBA:
-                return this->xBA;
+                frame = this->xBA;
+                break;
             case 0x76:
-                return this->x76;
+                frame = this->x76;
+                break;
             case 0x78:
-                return this->x78;
-            default:
-                return nullptr;
+                frame = this->x78;
+                break;
         }
+//        l->log("Returning " + String(id, HEX) + " from memloc " + String((int)frame, HEX));
+        return frame;
     }
 
     static bool idIsData(uint8_t id) {
@@ -79,14 +111,14 @@ public:
     }
 
     static bool idIsRequest(uint8_t id) {
-        return id == 0x39 || id == 0xba || id == 0x76;
+        return id == 0x39 || id == 0xba || id == 0x78;
     }
 
     static String frameToString(uint8_t* frame) {
         String s = "";
         for (int i = 0; i < 8; i++) {
             s += String(frame[i], HEX);
-            s += " ";
+            if (i < 7) s += " ";
         }
         return s;
     }

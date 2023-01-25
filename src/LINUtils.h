@@ -47,7 +47,7 @@ public:
         // configure to half baudrate --> a t_bit will be doubled
         ser->begin(19200 >> 1);
         // write 0x00, including Stop-Bit (=1),
-        // qualifies when writing in slow motion like a Break in normal speed
+        // qualifies when writi+ng in slow motion like a Break in normal speed
         size_t ret = ser->write(uint8_t(0x00));
         // ensure this is sent
         ser->flush();
@@ -78,6 +78,12 @@ public:
         ser->write(0x55);
         ser->write(ident);
         ser->flush();
+    }
+
+    static void flushRead(HardwareSerial* ser) {
+        while (ser->available()) {
+            ser->read();
+        }
     }
 };
 

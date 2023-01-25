@@ -48,6 +48,6 @@ bool testPanelChanged = false;
 
 void loop() {
     carHandlerSM->handleRead();
-    // panelHandler->sendEvery10ms();
+    panelHandlerSM->tick();
     // testChangePanelAfter3s();
 }

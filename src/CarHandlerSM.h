@@ -34,14 +34,17 @@ private:
 
 public:
     explicit CarHandlerSM(DataStore* ds, HardwareSerial* ser) {
-        this->l = new Logger("Car");
+        this->l = new Logger("Car", false);
         this->ds = ds;
         this->ser = ser;
+        ser->begin(19200);
     }
 
     void handleRead() {
+//        l->log("handleRead: " + String(ser->available()) + " bytes available");
         while (ser->available()) {
             uint8_t b = ser->read();
+//            l->log("read byte: " + String(b, HEX));
             handleByte(&b);
         }
     }
@@ -119,6 +122,14 @@ public:
                             + String(calculatedChecksum, HEX)
                     );
                     this->ds->saveFrame(this->currID, this->currFrame);
+//                    l->log(
+//                            "saved data: "
+//                            + String(this->currID, HEX)
+//                            + " - "
+//                            + DataStore::frameToString(this->ds->getFrame(this->currID))
+//                            + " to "
+//                            + String((int)this->ds->getFrame(this->currID), HEX)
+//                    );
                 } else {
                     // if checksum is bad, log error
                     l->log(

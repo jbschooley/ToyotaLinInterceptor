@@ -9,6 +9,7 @@ class PanelHandlerSM {
 private:
     enum PanelState {
         IDLE,
+        WAIT_ID,
         WAIT_BYTE_0,
         WAIT_BYTE_1,
         WAIT_BYTE_2,
@@ -35,9 +36,10 @@ private:
 
 public:
     explicit PanelHandlerSM(DataStore* ds, HardwareSerial* ser) {
-        this->l = new Logger("Panel");
+        this->l = new Logger("Panel", false);
         this->ds = ds;
         this->ser = ser;
+        ser->begin(19200);
     }
 
     void tick() {
@@ -53,21 +55,22 @@ public:
     }
 
     void sendNext() {
+        // send message
         if (DataStore::idIsData(this->nextMsg)) {
             // if data, send data
             l->log(
                     "send data: "
                     + String(this->nextMsg, HEX)
                     + " - "
-                    + DataStore::frameToString(this->currFrame)
+                    + DataStore::frameToString(this->ds->getFrame(this->nextMsg))
             );
             LINUtils::sendFrame(this->ser, this->nextMsg, this->ds->getFrame(this->nextMsg));
         } else if (DataStore::idIsRequest(this->nextMsg)) {
-            // if request, send id and go to next state to wait for response
-            this->currID = this->nextMsg;
+            // if request, send id
+//            this->currID = this->nextMsg;
             l->log(
                     "send request: "
-                    + String(this->currID, HEX)
+                    + String(this->nextMsg, HEX)
             );
             LINUtils::sendRequest(this->ser, this->nextMsg);
         }
@@ -81,7 +84,6 @@ public:
                 this->nextMsg = 0x39;
                 break;
             case 0x39:
-                this->state = WAIT_BYTE_0;
                 this->nextMsg = 0xba;
                 break;
             case 0xba:
@@ -91,11 +93,9 @@ public:
                 this->nextMsg = 0x76;
                 break;
             case 0x76:
-                this->state = WAIT_BYTE_0;
                 this->nextMsg = 0x78;
                 break;
             case 0x78:
-                this->state = WAIT_BYTE_0;
                 this->nextMsg = 0xb1;
                 break;
         }
@@ -111,6 +111,17 @@ public:
     void handleByte(const uint8_t* b) {
         switch (this->state) {
             case IDLE:
+                if (*b == 0x55) this->state = WAIT_ID;
+                break;
+            case WAIT_ID:
+                this->currID = *b;
+                if (DataStore::idIsRequest(this->currID)) {
+                    // if expecting response, go to next state
+                    this->state = WAIT_BYTE_0;
+                } else {
+                    // otherwise, go back to idle
+                    this->reset();
+                }
                 break;
             case WAIT_BYTE_0:
                 this->currFrame[0] = *b;
@@ -171,7 +182,13 @@ public:
                             + String(*b, HEX)
                     );
                 }
+                reset();
+                break;
         }
+    }
+
+    void reset() {
+        this->state = IDLE;
     }
 };
 
