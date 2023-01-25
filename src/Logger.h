@@ -12,7 +12,7 @@ private:
     bool enabled;
 
 public:
-    explicit Logger(const String& name, bool enabled = true) {
+    explicit Logger(const String& name, bool enabled=true) {
         this->ser = &Serial;
         this->name = name;
         this->enabled = enabled;

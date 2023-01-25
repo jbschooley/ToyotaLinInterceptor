@@ -21,10 +21,10 @@ public:
 
     void saveFrame(uint8_t id, uint8_t* frame) {
         // write to data store
+//        memcpy(frame, getFrame(id), 8);
         switch (id) {
             case 0xB1:
                 memcpy(frame, this->xB1, 8);
-                // TODO modify buttons depending on status
                 break;
             case 0x32:
                 memcpy(frame, this->x32, 8);
@@ -49,6 +49,28 @@ public:
                 break;
             default:
                 break;
+        }
+    }
+
+    uint8_t* getFrame(uint8_t id) {
+        // read from data store
+        switch (id) {
+            case 0xB1:
+                return this->xB1;
+            case 0x32:
+                return this->x32;
+            case 0xF5:
+                return this->xF5;
+            case 0x39:
+                return this->x39;
+            case 0xBA:
+                return this->xBA;
+            case 0x76:
+                return this->x76;
+            case 0x78:
+                return this->x78;
+            default:
+                return nullptr;
         }
     }
 

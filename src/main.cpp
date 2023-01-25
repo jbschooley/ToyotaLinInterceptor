@@ -1,13 +1,10 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
-//#include <arduino-timer.h>
-//#include "LINController.h"
-//#include "PanelHandler.h"
-//#include "CarHandler3.h"
 #include "LINUtils.h"
 #include "DataStore.h"
 #include "Logger.h"
 #include "CarHandlerSM.h"
+#include "PanelHandlerSM.h"
 
 #define SerialUSB Serial
 #define SerialCar Serial1
@@ -18,12 +15,10 @@
 
 unsigned long baud = 19200;
 
-//PanelHandler* panelHandler;
-//CarHandler3* carHandler;
-
 Logger* l;
 DataStore* ds;
 CarHandlerSM* carHandlerSM;
+PanelHandlerSM* panelHandlerSM;
 
 void setup() {
 
@@ -34,6 +29,7 @@ void setup() {
     l = new Logger("main");
     ds = new DataStore();
     carHandlerSM = new CarHandlerSM(ds, &SerialCar);
+    panelHandlerSM = new PanelHandlerSM(ds, &SerialPanel);
 
     // enable lin chips
     pinMode(PinEnPanel, OUTPUT);
