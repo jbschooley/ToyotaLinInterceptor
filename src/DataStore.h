@@ -76,12 +76,12 @@ public:
                 return this->xF5;
             case 0x39:
                 // only return modified buttons once
-//                if (buttonsModifiedSinceLastSend) {
-//                    buttonsModifiedSinceLastSend = false;
-//                    return this->x39Mod;
-//                } else {
-//                    return this->x39;
-//                }
+                if (buttonsModifiedSinceLastSend) {
+                    buttonsModifiedSinceLastSend = false;
+                    return this->x39Mod;
+                } else {
+                    return this->x39;
+                }
                 return this->x39;
             case 0xBA:
                 return this->xBA;
@@ -124,6 +124,7 @@ public:
     }
 
     static bool idIsRequest(uint8_t id) {
+        return id == 0x39 || id == 0xba;
         return id == 0x39 || id == 0xba || id == 0x78;
     }
 

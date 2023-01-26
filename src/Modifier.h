@@ -30,7 +30,7 @@ public:
     const uint8_t TEMP_PASSENGER[2] =       {5, 0x01};
 
     explicit Modifier(DataStore* ds) {
-        this->l = new Logger("Modifier", true);
+        this->l = new Logger("Modifier", false);
         this->ds = ds;
     }
 
@@ -60,8 +60,8 @@ public:
     // TEST STUFF
 
     void testButtons() {
-        testDefrostAfter3s();
-//        testIncreaseTemp();
+//        testDefrostAfter3s();
+        testIncreaseTemp();
     }
 
     bool testDefrostChanged = false;
@@ -87,10 +87,10 @@ public:
 //    }
 
     void testIncreaseTemp() {
-        if (millis() > 6000) {
+        if (millis() > 2000) {
             l->log("testIncreaseTemp");
             l->log("before: " + DataStore::frameToString(ds->x39));
-            changeTemp(TEMP_DRIVER, 1);
+            changeTemp(TEMP_DRIVER, -15);
             l->log("after:  " + DataStore::frameToString(ds->x39));
         }
     }

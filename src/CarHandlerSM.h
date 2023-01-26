@@ -5,6 +5,8 @@
 #ifndef TOYOTALININTERCEPTOR_CARHANDLERSM_H
 #define TOYOTALININTERCEPTOR_CARHANDLERSM_H
 
+#include "PanelHandlerSM.h"
+
 class CarHandlerSM {
 private:
     enum CarState {
@@ -32,6 +34,8 @@ private:
     uint8_t currFrame[8]{};
 
 public:
+    PanelHandlerSM* panelHandlerSM;
+
     explicit CarHandlerSM(DataStore* ds, Modifier* mod, HardwareSerial* ser) {
         this->l = new Logger("Car", false);
         this->ds = ds;
@@ -68,6 +72,7 @@ public:
                     // if neither, go back to idle
                     this->reset();
                 }
+                panelHandlerSM->sendMsg(this->currID);
                 break;
             case WAIT_BYTE_0:
                 this->currFrame[0] = *b;
@@ -116,6 +121,7 @@ public:
 //                            + String(calculatedChecksum, HEX)
 //                    );
                     this->ds->saveFrame(this->currID, this->currFrame);
+//                    panelHandlerSM->sendMsg(this->currID);
 //                    l->log(
 //                            "saved data: "
 //                            + String(this->currID, HEX)

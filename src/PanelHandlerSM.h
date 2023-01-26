@@ -32,10 +32,11 @@ private:
     uint8_t currFrame[8]{};
 
     // track next message to send
-    uint8_t nextMsg = 0xb1;
     unsigned long lastMillis = 0;
 
 public:
+    uint8_t nextMsg = 0xb1;
+
     explicit PanelHandlerSM(DataStore* ds, Modifier* mod, HardwareSerial* ser) {
         this->l = new Logger("Panel", false);
         this->ds = ds;
@@ -45,7 +46,7 @@ public:
     }
 
     void tick() {
-        sendEvery10ms();
+//        sendEvery10ms();
         handleRead();
     }
 
@@ -54,6 +55,11 @@ public:
             lastMillis = millis();
             sendNext();
         }
+    }
+
+    void sendMsg(uint8_t id) {
+        nextMsg = id;
+        sendNext();
     }
 
     void sendNext() {
@@ -171,7 +177,7 @@ public:
                     );
                     // TODO modify buttons at save?
                     this->ds->saveFrame(this->currID, this->currFrame);
-//                    mod->testButtons();
+                    mod->testButtons();
                 } else {
                     // checksum is bad, log error
                     l->log(

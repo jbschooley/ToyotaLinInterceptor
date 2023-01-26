@@ -34,6 +34,7 @@ void setup() {
     mod = new Modifier(ds);
     carHandlerSM = new CarHandlerSM(ds, mod, &SerialCar);
     panelHandlerSM = new PanelHandlerSM(ds, mod, &SerialPanel);
+    carHandlerSM->panelHandlerSM = panelHandlerSM;
 
     // enable lin chips
     pinMode(PinEnPanel, OUTPUT);
