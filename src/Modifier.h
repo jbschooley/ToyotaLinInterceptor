@@ -13,21 +13,21 @@ private:
     DataStore* ds;
 
 public:
-    const uint8_t BUTTON_OFF[8] =           {0x02,    0,    0,    0,    0,    0,    0,    0};
-    const uint8_t BUTTON_AUTO[8] =          {0x08,    0,    0,    0,    0,    0,    0,    0};
-    const uint8_t BUTTON_SYNC[8] =          {   0,    0,    0, 0x20,    0,    0,    0,    0};
-    const uint8_t BUTTON_AC[8] =            {0x80,    0,    0,    0,    0,    0,    0,    0};
-    const uint8_t BUTTON_FRONT_DEFROST[8] = {   0,    0,    0, 0x80,    0,    0,    0,    0};
-    const uint8_t BUTTON_REAR_DEFROST[8] =  {   0,    0,    0, 0x40,    0,    0,    0,    0};
-    const uint8_t BUTTON_ECO[8] =           {   0, 0x40,    0,    0,    0,    0,    0,    0};
-    const uint8_t BUTTON_FAN_DOWN[8] =      {   0, 0x3d,    0,    0,    0,    0,    0,    0};
-    const uint8_t BUTTON_FAN_UP[8] =        {   0, 0x3c,    0,    0,    0,    0,    0,    0};
-    const uint8_t BUTTON_MODE[8] =          {   0,    0, 0x1c,    0,    0,    0,    0,    0};
-    const uint8_t BUTTON_RECYCLE[8] =       {   0,    0,    0,    0,    0,    0, 0xc0,    0};
-    const uint8_t BUTTON_S_MODE[8] =        {   0, 0x80,    0,    0,    0,    0,    0,    0};
+    const uint8_t BUTTON_OFF[2] =           {0, 0x02};
+    const uint8_t BUTTON_AUTO[2] =          {0, 0x08};
+    const uint8_t BUTTON_SYNC[2] =          {3, 0x20};
+    const uint8_t BUTTON_AC[2] =            {0, 0x80};
+    const uint8_t BUTTON_FRONT_DEFROST[2] = {3, 0x80};
+    const uint8_t BUTTON_REAR_DEFROST[2] =  {3, 0x40};
+    const uint8_t BUTTON_ECO[2] =           {1, 0x40};
+    const uint8_t BUTTON_FAN_DOWN[2] =      {1, 0x3d};
+    const uint8_t BUTTON_FAN_UP[2] =        {1, 0x3c};
+    const uint8_t BUTTON_MODE[2] =          {2, 0x1c};
+    const uint8_t BUTTON_RECYCLE[2] =       {6, 0xc0};
+    const uint8_t BUTTON_S_MODE[2] =        {1, 0x80};
 
-    const uint8_t TEMP_DRIVER[8] =          {   0,    0,    0,    0, 0x01,    0,    0,    0};
-    const uint8_t TEMP_PASSENGER[8] =       {   0,    0,    0,    0,    0, 0x01,    0,    0};
+    const uint8_t TEMP_DRIVER[2] =          {4, 0x01};
+    const uint8_t TEMP_PASSENGER[2] =       {5, 0x01};
 
     explicit Modifier(DataStore* ds) {
         this->l = new Logger("Modifier", true);
@@ -35,16 +35,12 @@ public:
     }
 
     void pressButton(const uint8_t* button) {
-        uint8_t* frame = ds->x39;
-        for (int i = 0; i < 8; i++) {
-            frame[i] |= button[i];
-        }
+        ds->x39[button[0]] |= button[1];
     }
 
     void changeTemp(const uint8_t* zone, uint8_t delta) {
         uint8_t* frame = ds->x39;
-        frame[4] += zone[4] * delta;
-        frame[5] += zone[5] * delta;
+        frame[zone[0]] += zone[1] * delta;
     }
 
     void changeTempLog(const uint8_t* zone, uint8_t delta) {
