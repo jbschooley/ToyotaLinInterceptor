@@ -112,7 +112,7 @@ public:
         return id == 0x39 || id == 0xba || id == 0x78;
     }
 
-    static String frameToString(uint8_t* frame) {
+    static String frameToString(const uint8_t* frame) {
         String s = "";
         for (int i = 0; i < 8; i++) {
             s += String(frame[i], HEX);

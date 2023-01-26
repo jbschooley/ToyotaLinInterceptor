@@ -29,6 +29,7 @@ void setup() {
 
     // initialize logger, data store, handlers
     l = new Logger("main");
+    l->log("begin setup");
     ds = new DataStore();
     mod = new Modifier(ds);
     carHandlerSM = new CarHandlerSM(ds, mod, &SerialCar);
@@ -39,6 +40,12 @@ void setup() {
     digitalWrite(PinEnPanel, HIGH);
     pinMode(PinEnCar, OUTPUT);
     digitalWrite(PinEnCar, HIGH);
+
+    l->log("end setup");
+
+//    l->log("testing defrost");
+//    mod->testTemp();
+//    mod->printButton(mod->BUTTON_OFF);
 }
 
 bool testPanelChanged = false;
