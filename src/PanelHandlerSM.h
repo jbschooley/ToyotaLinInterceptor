@@ -171,6 +171,7 @@ public:
                     );
                     // TODO modify buttons at save?
                     this->ds->saveFrame(this->currID, this->currFrame);
+//                    mod->testButtons();
                 } else {
                     // checksum is bad, log error
                     l->log(

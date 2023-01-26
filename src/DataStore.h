@@ -5,9 +5,12 @@
 #ifndef TOYOTALININTERCEPTOR_DATASTORE_H
 #define TOYOTALININTERCEPTOR_DATASTORE_H
 
+#include "Logger.h"
+
 class DataStore {
 private:
     Logger* l;
+
 public:
     // data
 //    uint8_t xB1[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // status
@@ -19,6 +22,11 @@ public:
     uint8_t xBA[8] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44};
     uint8_t x76[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // unused as nothing responds to this
     uint8_t x78[8] = {0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+//    bool doModifyButtons = false;
+    uint8_t x39Mod[8] = {0x40, 0x00, 0x00, 0x00, 0x10, 0x90, 0x00, 0x00};
+
+    bool buttonsModifiedSinceLastSend = false;
 
     DataStore() {
         this->l = new Logger("DataStore", false);
@@ -58,50 +66,57 @@ public:
     uint8_t* getFrame(uint8_t id) {
         // read from data store
 //        l->log("get datastore memloc " + String((int)this, HEX));
-        uint8_t* frame = nullptr;
-//        switch (id) {
-//            case 0xB1:
-//                return this->xB1;
-//            case 0x32:
-//                return this->x32;
-//            case 0xF5:
-//                return this->xF5;
-//            case 0x39:
-//                return this->x39;
-//            case 0xBA:
-//                return this->xBA;
-//            case 0x76:
-//                return this->x76;
-//            case 0x78:
-//                return this->x78;
-//            default:
-//                return nullptr;
-//        }
+//        uint8_t* frame = nullptr;
         switch (id) {
             case 0xB1:
-                frame = this->xB1;
-                break;
+                return this->xB1;
             case 0x32:
-                frame = this->x32;
-                break;
+                return this->x32;
             case 0xF5:
-                frame = this->xF5;
-                break;
+                return this->xF5;
             case 0x39:
-                frame = this->x39;
-                break;
+                // only return modified buttons once
+//                if (buttonsModifiedSinceLastSend) {
+//                    buttonsModifiedSinceLastSend = false;
+//                    return this->x39Mod;
+//                } else {
+//                    return this->x39;
+//                }
+                return this->x39;
             case 0xBA:
-                frame = this->xBA;
-                break;
+                return this->xBA;
             case 0x76:
-                frame = this->x76;
-                break;
+                return this->x76;
             case 0x78:
-                frame = this->x78;
-                break;
+                return this->x78;
+            default:
+                return nullptr;
         }
-//        l->log("Returning " + String(id, HEX) + " from memloc " + String((int)frame, HEX));
-        return frame;
+//        switch (id) {
+//            case 0xB1:
+//                frame = this->xB1;
+//                break;
+//            case 0x32:
+//                frame = this->x32;
+//                break;
+//            case 0xF5:
+//                frame = this->xF5;
+//                break;
+//            case 0x39:
+//                frame = this->x39;
+//                break;
+//            case 0xBA:
+//                frame = this->xBA;
+//                break;
+//            case 0x76:
+//                frame = this->x76;
+//                break;
+//            case 0x78:
+//                frame = this->x78;
+//                break;
+//        }
+////        l->log("Returning " + String(id, HEX) + " from memloc " + String((int)frame, HEX));
+//        return frame;
     }
 
     static bool idIsData(uint8_t id) {

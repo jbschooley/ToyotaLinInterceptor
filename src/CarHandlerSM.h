@@ -62,13 +62,6 @@ public:
                 } else if (DataStore::idIsRequest(this->currID)) {
                     // if request, send response and go back to idle
                     // TODO modify buttons at send?
-                    mod->testButtons();
-                    l->log(
-                            "received request: "
-                            + String(this->currID, HEX)
-                            + " responding with: "
-                            + DataStore::frameToString(ds->getFrame(this->currID))
-                    );
                     LINUtils::sendResponse(this->ser, this->currID, this->ds->getFrame(this->currID));
                     this->reset();
                 } else {
@@ -114,14 +107,14 @@ public:
                 if (calculatedChecksum == *b) {
                     // this is reached after frame has been received and verified
                     // print frame to serial
-                    l->log(
-                            "received data: "
-                            + String(this->currID, HEX)
-                            + " - "
-                            + DataStore::frameToString(this->currFrame)
-                            + " - "
-                            + String(calculatedChecksum, HEX)
-                    );
+//                    l->log(
+//                            "received data: "
+//                            + String(this->currID, HEX)
+//                            + " - "
+//                            + DataStore::frameToString(this->currFrame)
+//                            + " - "
+//                            + String(calculatedChecksum, HEX)
+//                    );
                     this->ds->saveFrame(this->currID, this->currFrame);
 //                    l->log(
 //                            "saved data: "

@@ -34,13 +34,21 @@ public:
         this->ds = ds;
     }
 
+    void setButtonsModified() {
+        if (!ds->buttonsModifiedSinceLastSend) {
+            ds->buttonsModifiedSinceLastSend = true;
+            memcpy(ds->x39Mod, ds->x39, 8);
+        }
+    }
+
     void pressButton(const uint8_t* button) {
-        ds->x39[button[0]] |= button[1];
+        setButtonsModified();
+        ds->x39Mod[button[0]] |= button[1];
     }
 
     void changeTemp(const uint8_t* zone, uint8_t delta) {
-        uint8_t* frame = ds->x39;
-        frame[zone[0]] += zone[1] * delta;
+        setButtonsModified();
+        ds->x39Mod[zone[0]] += zone[1] * delta;
     }
 
     void changeTempLog(const uint8_t* zone, uint8_t delta) {
@@ -53,7 +61,7 @@ public:
 
     void testButtons() {
         testDefrostAfter3s();
-        testIncreaseTemp();
+//        testIncreaseTemp();
     }
 
     bool testDefrostChanged = false;
@@ -63,7 +71,7 @@ public:
             l->log("testDefrostAfter3s");
             l->log("before: " + DataStore::frameToString(ds->x39));
             pressButton(BUTTON_FRONT_DEFROST);
-            l->log("after:  " + DataStore::frameToString(ds->x39));
+            l->log("after:  " + DataStore::frameToString(ds->x39Mod));
             l->log("checksum: " + String(LINUtils::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
         }
     }

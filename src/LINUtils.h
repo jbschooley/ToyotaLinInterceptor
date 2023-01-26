@@ -5,6 +5,8 @@
 #ifndef TOYOTALININTERCEPTOR_LINUTILS_H
 #define TOYOTALININTERCEPTOR_LINUTILS_H
 
+#include "DataStore.h"
+
 class LINUtils {
 private:
 //    static unsigned long baud = 19200;
@@ -68,6 +70,7 @@ public:
 
     static void sendResponse(HardwareSerial* ser, byte ident, const byte data[]) {
         byte chksm = getChecksum(&ident, data);
+//        if (ident == 0x39) Serial.println("sending buttons " + DataStore::frameToString(data) + " - " + String(LINUtils::getChecksum(&ident, data), HEX));
         for(int i=0; i<8; i++) ser->write(data[i]);
         ser->write(chksm);
         ser->flush();
