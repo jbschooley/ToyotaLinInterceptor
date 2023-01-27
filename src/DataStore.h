@@ -36,9 +36,7 @@ public:
         // write to data store
         switch (id) {
             case 0xB1:
-//                l->log("SAVING B1 " + DataStore::frameToString(frame) + " to memloc " + String((int)this->getFrame(id), HEX));
                 memcpy(this->xB1, frame, 8);
-//                l->log("SAVED B1  " + DataStore::frameToString(this->xB1) + " to memloc " + String((int)this->xB1, HEX));
                 break;
             case 0x32:
                 memcpy(this->x32, frame, 8);
@@ -65,8 +63,6 @@ public:
 
     uint8_t* getFrame(uint8_t id) {
         // read from data store
-//        l->log("get datastore memloc " + String((int)this, HEX));
-//        uint8_t* frame = nullptr;
         switch (id) {
             case 0xB1:
                 return this->xB1;
@@ -82,7 +78,6 @@ public:
                 } else {
                     return this->x39;
                 }
-                return this->x39;
             case 0xBA:
                 return this->xBA;
             case 0x76:
@@ -92,31 +87,6 @@ public:
             default:
                 return nullptr;
         }
-//        switch (id) {
-//            case 0xB1:
-//                frame = this->xB1;
-//                break;
-//            case 0x32:
-//                frame = this->x32;
-//                break;
-//            case 0xF5:
-//                frame = this->xF5;
-//                break;
-//            case 0x39:
-//                frame = this->x39;
-//                break;
-//            case 0xBA:
-//                frame = this->xBA;
-//                break;
-//            case 0x76:
-//                frame = this->x76;
-//                break;
-//            case 0x78:
-//                frame = this->x78;
-//                break;
-//        }
-////        l->log("Returning " + String(id, HEX) + " from memloc " + String((int)frame, HEX));
-//        return frame;
     }
 
     static bool idIsData(uint8_t id) {
@@ -124,8 +94,7 @@ public:
     }
 
     static bool idIsRequest(uint8_t id) {
-        return id == 0x39 || id == 0xba;
-        // return id == 0x39 || id == 0xba || id == 0x78;
+        return id == 0x39 || id == 0xba; // || id == 0x78;
     }
 
     static bool idIsDataPanel(uint8_t id) {

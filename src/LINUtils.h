@@ -22,8 +22,7 @@ public:
 //        return (uint8_t) (0xFF - sum);
 //    }
 
-    static uint8_t getChecksum(const uint8_t* ident, const uint8_t* frame)
-    {
+    static uint8_t getChecksum(const uint8_t* ident, const uint8_t* frame) {
         uint16_t sum = *ident;
         // test FrameID bits for classicChecksum
         if ((sum & 0x3F) >= 0x3C) {
@@ -70,7 +69,6 @@ public:
 
     static void sendResponse(HardwareSerial* ser, byte ident, const byte data[]) {
         byte chksm = getChecksum(&ident, data);
-//        if (ident == 0x39) Serial.println("sending buttons " + DataStore::frameToString(data) + " - " + String(LINUtils::getChecksum(&ident, data), HEX));
         for(int i=0; i<8; i++) ser->write(data[i]);
         ser->write(chksm);
         ser->flush();
@@ -81,12 +79,6 @@ public:
         ser->write(0x55);
         ser->write(ident);
         ser->flush();
-    }
-
-    static void flushRead(HardwareSerial* ser) {
-        while (ser->available()) {
-            ser->read();
-        }
     }
 };
 

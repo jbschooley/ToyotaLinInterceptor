@@ -75,7 +75,7 @@ public:
             LINUtils::sendFrame(this->ser, this->nextMsg, this->ds->getFrame(this->nextMsg));
         } else if (DataStore::idIsRequestPanel(this->nextMsg)) {
             // if request, send id......................
-            
+
             l->log(
                     "send request: "
                     + String(this->nextMsg, HEX)
@@ -175,7 +175,7 @@ public:
                             + " - "
                             + String(calculatedChecksum, HEX)
                     );
-                    // TODO modify buttons at save?
+                    // TODO modify buttons at receive?
                     this->ds->saveFrame(this->currID, this->currFrame);
                     mod->testButtons();
                 } else {

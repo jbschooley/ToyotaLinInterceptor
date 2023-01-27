@@ -72,7 +72,8 @@ public:
                     // if neither, go back to idle
                     this->reset();
                 }
-                // Request button status from panel if car sent 0x78 (3 messages before 0x39 for buffer)
+                // Request button status from panel if car sent 0x78
+                // 0x78 is 3 messages before 0x39 for buffer; seems to be fastest and most reliable
                 if (this->currID == 0x78) panelHandlerSM->sendMsg(0x39);
                 break;
             case WAIT_BYTE_0:
