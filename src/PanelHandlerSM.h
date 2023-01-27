@@ -64,7 +64,7 @@ public:
 
     void sendNext() {
         // send message
-        if (DataStore::idIsData(this->nextMsg)) {
+        if (DataStore::idIsDataPanel(this->nextMsg)) {
             // if data, send data
             l->log(
                     "send data: "
@@ -73,9 +73,9 @@ public:
                     + DataStore::frameToString(this->ds->getFrame(this->nextMsg))
             );
             LINUtils::sendFrame(this->ser, this->nextMsg, this->ds->getFrame(this->nextMsg));
-        } else if (DataStore::idIsRequest(this->nextMsg)) {
-            // if request, send id
-//            this->currID = this->nextMsg;
+        } else if (DataStore::idIsRequestPanel(this->nextMsg)) {
+            // if request, send id......................
+            
             l->log(
                     "send request: "
                     + String(this->nextMsg, HEX)

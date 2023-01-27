@@ -125,7 +125,15 @@ public:
 
     static bool idIsRequest(uint8_t id) {
         return id == 0x39 || id == 0xba;
-        return id == 0x39 || id == 0xba || id == 0x78;
+        // return id == 0x39 || id == 0xba || id == 0x78;
+    }
+
+    static bool idIsDataPanel(uint8_t id) {
+        return id == 0xb1;
+    }
+
+    static bool idIsRequestPanel(uint8_t id) {
+        return id == 0x39;
     }
 
     static String frameToString(const uint8_t* frame) {

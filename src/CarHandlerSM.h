@@ -72,7 +72,8 @@ public:
                     // if neither, go back to idle
                     this->reset();
                 }
-                panelHandlerSM->sendMsg(this->currID);
+                // Request button status from panel if car sent 0x78 (3 messages before 0x39 for buffer)
+                if (this->currID == 0x78) panelHandlerSM->sendMsg(0x39);
                 break;
             case WAIT_BYTE_0:
                 this->currFrame[0] = *b;
@@ -121,7 +122,8 @@ public:
 //                            + String(calculatedChecksum, HEX)
 //                    );
                     this->ds->saveFrame(this->currID, this->currFrame);
-//                    panelHandlerSM->sendMsg(this->currID);
+                    // if car sent climate status, forward to panel
+                    if (this->currID == 0xb1) panelHandlerSM->sendMsg(this->currID);
 //                    l->log(
 //                            "saved data: "
 //                            + String(this->currID, HEX)
