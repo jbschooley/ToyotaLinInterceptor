@@ -7,79 +7,31 @@
 
 #include "Handler.h"
 
-class PanelHandler : protected Handler {
-private:
-    // track next message to send
-    unsigned long lastMillis = 0;
-
+class PanelHandler : public Handler {
 public:
-    uint8_t nextMsg = 0xb1;
 
     explicit PanelHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
             : Handler(ds, mod, ser, new Logger("Panel", false)){
     }
 
-    void tick() {
-//        sendEvery10ms();
-        handleRead();
-    }
-
-    void sendEvery10ms() {
-        if (millis() - lastMillis >= 10) {
-            lastMillis = millis();
-            sendNext();
-        }
-    }
-
     void sendMsg(uint8_t id) {
-        nextMsg = id;
-        sendNext();
-    }
-
-    void sendNext() {
         // send message
-        if (DataStore::idIsDataPanel(nextMsg)) {
+        if (DataStore::idIsDataPanel(id)) {
             // if data, send data
             l->log(
                     "send data: "
-                    + String(nextMsg, HEX)
+                    + String(id, HEX)
                     + " - "
-                    + DataStore::frameToString(ds->getFrame(nextMsg))
+                    + DataStore::frameToString(ds->getFrame(id))
             );
-            LINUtils::sendFrame(ser, nextMsg, ds->getFrame(nextMsg));
-        } else if (DataStore::idIsRequestPanel(nextMsg)) {
-            // if request, send id......................
-
+            LINUtils::sendFrame(ser, id, ds->getFrame(id));
+        } else if (DataStore::idIsRequestPanel(id)) {
+            // if request, send id
             l->log(
                     "send request: "
-                    + String(nextMsg, HEX)
+                    + String(id, HEX)
             );
-            LINUtils::sendRequest(ser, nextMsg);
-        }
-
-        // set next message
-        switch (nextMsg) {
-            case 0xb1:
-                nextMsg = 0x32;
-                break;
-            case 0x32:
-                nextMsg = 0x39;
-                break;
-            case 0x39:
-                nextMsg = 0xba;
-                break;
-            case 0xba:
-                nextMsg = 0xf5;
-                break;
-            case 0xf5:
-                nextMsg = 0x76;
-                break;
-            case 0x76:
-                nextMsg = 0x78;
-                break;
-            case 0x78:
-                nextMsg = 0xb1;
-                break;
+            LINUtils::sendRequest(ser, id);
         }
     }
 

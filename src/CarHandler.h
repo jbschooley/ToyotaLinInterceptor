@@ -10,7 +10,7 @@
 
 class CarHandler : public Handler {
 public:
-    PanelHandler* panelHandlerSM;
+    PanelHandler* panelHandlerSM{};
 
     explicit CarHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
             : Handler(ds, mod, ser, new Logger("Car", false)) {}
