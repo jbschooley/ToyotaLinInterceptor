@@ -28,7 +28,7 @@ public:
                 } else if (DataStore::idIsRequest(currID)) {
                     // if request, send response and go back to idle
                     // TODO modify buttons at send?
-                    LINUtils::sendResponse(ser, currID, ds->getFrame(currID));
+                    lin->sendResponse(currID, ds->getFrame(currID));
                     reset();
                 } else {
                     // if neither, go back to idle
@@ -71,7 +71,7 @@ public:
                 state = WAIT_CHECKSUM;
                 break;
             case WAIT_CHECKSUM:
-                uint8_t calculatedChecksum = LINUtils::getChecksum(&currID, currFrame);
+                uint8_t calculatedChecksum = LINController::getChecksum(&currID, currFrame);
                 // if checksum is good, save frame to data store
                 if (calculatedChecksum == *b) {
                     // this is reached after frame has been received and verified

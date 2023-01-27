@@ -26,7 +26,7 @@ protected:
     Logger* l;
     DataStore* ds;
     Modifier* mod;
-    HardwareSerial* ser;
+    LINController* lin;
     State state = IDLE;
 
     // current frame to store received data
@@ -39,15 +39,14 @@ public:
         this->l = l;
         this->ds = ds;
         this->mod = mod;
-        this->ser = ser;
-        ser->begin(19200);
+        this->lin = new LINController(ser);
     }
 
     virtual void handleByte(const uint8_t* b) {}
 
     void handleRead() {
-        while (ser->available()) {
-            uint8_t b = ser->read();
+        while (lin->available()) {
+            uint8_t b = lin->read();
             handleByte(&b);
         }
     }

@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
-#include "LINUtils.h"
+#include "LINController.h"
 #include "Logger.h"
 #include "DataStore.h"
 #include "Modifier.h"
@@ -14,13 +14,13 @@
 #define PinEnPanel 53
 #define PinEnCar 46
 
-unsigned long baud = 19200;
+//unsigned long baud = 19200;
 
 Logger* l;
 DataStore* ds;
 Modifier* mod;
-CarHandler* carHandlerSM;
-PanelHandler* panelHandlerSM;
+CarHandler* carHandler;
+PanelHandler* panelHandler;
 
 void setup() {
 
@@ -32,9 +32,9 @@ void setup() {
     l->log("begin setup");
     ds = new DataStore();
     mod = new Modifier(ds);
-    carHandlerSM = new CarHandler(ds, mod, &SerialCar);
-    panelHandlerSM = new PanelHandler(ds, mod, &SerialPanel);
-    carHandlerSM->panelHandlerSM = panelHandlerSM;
+    carHandler = new CarHandler(ds, mod, &SerialCar);
+    panelHandler = new PanelHandler(ds, mod, &SerialPanel);
+    carHandler->panelHandlerSM = panelHandler;
 
     // enable lin chips
     pinMode(PinEnPanel, OUTPUT);
@@ -58,7 +58,7 @@ bool testPanelChanged = false;
 //}
 
 void loop() {
-    carHandlerSM->handleRead();
-    panelHandlerSM->handleRead();
+    carHandler->handleRead();
+    panelHandler->handleRead();
     // testChangePanelAfter3s();
 }

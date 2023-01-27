@@ -24,14 +24,14 @@ public:
                     + " - "
                     + DataStore::frameToString(ds->getFrame(id))
             );
-            LINUtils::sendFrame(ser, id, ds->getFrame(id));
+            lin->sendFrame(id, ds->getFrame(id));
         } else if (DataStore::idIsRequestPanel(id)) {
             // if request, send id
             l->log(
                     "send request: "
                     + String(id, HEX)
             );
-            LINUtils::sendRequest(ser, id);
+            lin->sendRequest(id);
         }
     }
 
@@ -83,7 +83,7 @@ public:
                 state = WAIT_CHECKSUM;
                 break;
             case WAIT_CHECKSUM:
-                uint8_t calculatedChecksum = LINUtils::getChecksum(&currID, currFrame);
+                uint8_t calculatedChecksum = LINController::getChecksum(&currID, currFrame);
                 if (calculatedChecksum == *b) {
                     // response is good, send to datastore
                     l->log(

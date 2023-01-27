@@ -72,7 +72,7 @@ public:
             l->log("before: " + DataStore::frameToString(ds->x39));
             pressButton(BUTTON_FRONT_DEFROST);
             l->log("after:  " + DataStore::frameToString(ds->x39Mod));
-            l->log("checksum: " + String(LINUtils::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
+            l->log("checksum: " + String(LINController::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
         }
     }
 
