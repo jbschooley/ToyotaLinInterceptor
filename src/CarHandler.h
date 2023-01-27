@@ -16,99 +16,99 @@ public:
             : Handler(ds, mod, ser, new Logger("Car", false)) {}
 
     void handleByte(const uint8_t* b) override {
-        switch (this->state) {
+        switch (state) {
             case IDLE:
-                if (*b == 0x55) this->state = WAIT_ID;
+                if (*b == 0x55) state = WAIT_ID;
                 break;
             case WAIT_ID:
-                this->currID = *b;
-                if (DataStore::idIsData(this->currID)) {
+                currID = *b;
+                if (DataStore::idIsData(currID)) {
                     // if data, go to next state
-                    this->state = WAIT_BYTE_0;
-                } else if (DataStore::idIsRequest(this->currID)) {
+                    state = WAIT_BYTE_0;
+                } else if (DataStore::idIsRequest(currID)) {
                     // if request, send response and go back to idle
                     // TODO modify buttons at send?
-                    LINUtils::sendResponse(this->ser, this->currID, this->ds->getFrame(this->currID));
-                    this->reset();
+                    LINUtils::sendResponse(ser, currID, ds->getFrame(currID));
+                    reset();
                 } else {
                     // if neither, go back to idle
-                    this->reset();
+                    reset();
                 }
                 // Request button status from panel if car sent 0x78
                 // 0x78 is 3 messages before 0x39 for buffer; seems to be fastest and most reliable
-                if (this->currID == 0x78) panelHandlerSM->sendMsg(0x39);
+                if (currID == 0x78) panelHandlerSM->sendMsg(0x39);
                 break;
             case WAIT_BYTE_0:
-                this->currFrame[0] = *b;
-                this->state = WAIT_BYTE_1;
+                currFrame[0] = *b;
+                state = WAIT_BYTE_1;
                 break;
             case WAIT_BYTE_1:
-                this->currFrame[1] = *b;
-                this->state = WAIT_BYTE_2;
+                currFrame[1] = *b;
+                state = WAIT_BYTE_2;
                 break;
             case WAIT_BYTE_2:
-                this->currFrame[2] = *b;
-                this->state = WAIT_BYTE_3;
+                currFrame[2] = *b;
+                state = WAIT_BYTE_3;
                 break;
             case WAIT_BYTE_3:
-                this->currFrame[3] = *b;
-                this->state = WAIT_BYTE_4;
+                currFrame[3] = *b;
+                state = WAIT_BYTE_4;
                 break;
             case WAIT_BYTE_4:
-                this->currFrame[4] = *b;
-                this->state = WAIT_BYTE_5;
+                currFrame[4] = *b;
+                state = WAIT_BYTE_5;
                 break;
             case WAIT_BYTE_5:
-                this->currFrame[5] = *b;
-                this->state = WAIT_BYTE_6;
+                currFrame[5] = *b;
+                state = WAIT_BYTE_6;
                 break;
             case WAIT_BYTE_6:
-                this->currFrame[6] = *b;
-                this->state = WAIT_BYTE_7;
+                currFrame[6] = *b;
+                state = WAIT_BYTE_7;
                 break;
             case WAIT_BYTE_7:
-                this->currFrame[7] = *b;
-                this->state = WAIT_CHECKSUM;
+                currFrame[7] = *b;
+                state = WAIT_CHECKSUM;
                 break;
             case WAIT_CHECKSUM:
-                uint8_t calculatedChecksum = LINUtils::getChecksum(&this->currID, this->currFrame);
+                uint8_t calculatedChecksum = LINUtils::getChecksum(&currID, currFrame);
                 // if checksum is good, save frame to data store
                 if (calculatedChecksum == *b) {
                     // this is reached after frame has been received and verified
                     // print frame to serial
 //                    l->log(
 //                            "received data: "
-//                            + String(this->currID, HEX)
+//                            + String(currID, HEX)
 //                            + " - "
-//                            + DataStore::frameToString(this->currFrame)
+//                            + DataStore::frameToString(currFrame)
 //                            + " - "
 //                            + String(calculatedChecksum, HEX)
 //                    );
-                    this->ds->saveFrame(this->currID, this->currFrame);
+                    ds->saveFrame(currID, currFrame);
                     // if car sent climate status, forward to panel
-                    if (this->currID == 0xb1) panelHandlerSM->sendMsg(this->currID);
+                    if (currID == 0xb1) panelHandlerSM->sendMsg(currID);
 //                    l->log(
 //                            "saved data: "
-//                            + String(this->currID, HEX)
+//                            + String(currID, HEX)
 //                            + " - "
-//                            + DataStore::frameToString(this->ds->getFrame(this->currID))
+//                            + DataStore::frameToString(ds->getFrame(currID))
 //                            + " to "
-//                            + String((int)this->ds->getFrame(this->currID), HEX)
+//                            + String((int)ds->getFrame(currID), HEX)
 //                    );
                 } else {
                     // if checksum is bad, log error
                     l->log(
                             "Checksum error ID "
-                            + String(this->currID, HEX)
+                            + String(currID, HEX)
                             + " - "
-                            + DataStore::frameToString(this->currFrame)
+                            + DataStore::frameToString(currFrame)
                             + " - "
                             + String(calculatedChecksum, HEX)
                             + " - "
                             + String(*b, HEX)
                     );
                 }
-                this->reset();
+                reset();
                 break;
         }
     }

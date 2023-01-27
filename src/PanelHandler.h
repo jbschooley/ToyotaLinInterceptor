@@ -38,120 +38,120 @@ public:
 
     void sendNext() {
         // send message
-        if (DataStore::idIsDataPanel(this->nextMsg)) {
+        if (DataStore::idIsDataPanel(nextMsg)) {
             // if data, send data
             l->log(
                     "send data: "
-                    + String(this->nextMsg, HEX)
+                    + String(nextMsg, HEX)
                     + " - "
-                    + DataStore::frameToString(this->ds->getFrame(this->nextMsg))
+                    + DataStore::frameToString(ds->getFrame(nextMsg))
             );
-            LINUtils::sendFrame(this->ser, this->nextMsg, this->ds->getFrame(this->nextMsg));
-        } else if (DataStore::idIsRequestPanel(this->nextMsg)) {
+            LINUtils::sendFrame(ser, nextMsg, ds->getFrame(nextMsg));
+        } else if (DataStore::idIsRequestPanel(nextMsg)) {
             // if request, send id......................
 
             l->log(
                     "send request: "
-                    + String(this->nextMsg, HEX)
+                    + String(nextMsg, HEX)
             );
-            LINUtils::sendRequest(this->ser, this->nextMsg);
+            LINUtils::sendRequest(ser, nextMsg);
         }
 
         // set next message
-        switch (this->nextMsg) {
+        switch (nextMsg) {
             case 0xb1:
-                this->nextMsg = 0x32;
+                nextMsg = 0x32;
                 break;
             case 0x32:
-                this->nextMsg = 0x39;
+                nextMsg = 0x39;
                 break;
             case 0x39:
-                this->nextMsg = 0xba;
+                nextMsg = 0xba;
                 break;
             case 0xba:
-                this->nextMsg = 0xf5;
+                nextMsg = 0xf5;
                 break;
             case 0xf5:
-                this->nextMsg = 0x76;
+                nextMsg = 0x76;
                 break;
             case 0x76:
-                this->nextMsg = 0x78;
+                nextMsg = 0x78;
                 break;
             case 0x78:
-                this->nextMsg = 0xb1;
+                nextMsg = 0xb1;
                 break;
         }
     }
 
     void handleByte(const uint8_t* b) override {
-        switch (this->state) {
+        switch (state) {
             case IDLE:
-                if (*b == 0x55) this->state = WAIT_ID;
+                if (*b == 0x55) state = WAIT_ID;
                 break;
             case WAIT_ID:
-                this->currID = *b;
-                if (DataStore::idIsRequest(this->currID)) {
+                currID = *b;
+                if (DataStore::idIsRequest(currID)) {
                     // if expecting response, go to next state
-                    this->state = WAIT_BYTE_0;
+                    state = WAIT_BYTE_0;
                 } else {
                     // otherwise, go back to idle
-                    this->reset();
+                    reset();
                 }
                 break;
             case WAIT_BYTE_0:
-                this->currFrame[0] = *b;
-                this->state = WAIT_BYTE_1;
+                currFrame[0] = *b;
+                state = WAIT_BYTE_1;
                 break;
             case WAIT_BYTE_1:
-                this->currFrame[1] = *b;
-                this->state = WAIT_BYTE_2;
+                currFrame[1] = *b;
+                state = WAIT_BYTE_2;
                 break;
             case WAIT_BYTE_2:
-                this->currFrame[2] = *b;
-                this->state = WAIT_BYTE_3;
+                currFrame[2] = *b;
+                state = WAIT_BYTE_3;
                 break;
             case WAIT_BYTE_3:
-                this->currFrame[3] = *b;
-                this->state = WAIT_BYTE_4;
+                currFrame[3] = *b;
+                state = WAIT_BYTE_4;
                 break;
             case WAIT_BYTE_4:
-                this->currFrame[4] = *b;
-                this->state = WAIT_BYTE_5;
+                currFrame[4] = *b;
+                state = WAIT_BYTE_5;
                 break;
             case WAIT_BYTE_5:
-                this->currFrame[5] = *b;
-                this->state = WAIT_BYTE_6;
+                currFrame[5] = *b;
+                state = WAIT_BYTE_6;
                 break;
             case WAIT_BYTE_6:
-                this->currFrame[6] = *b;
-                this->state = WAIT_BYTE_7;
+                currFrame[6] = *b;
+                state = WAIT_BYTE_7;
                 break;
             case WAIT_BYTE_7:
-                this->currFrame[7] = *b;
-                this->state = WAIT_CHECKSUM;
+                currFrame[7] = *b;
+                state = WAIT_CHECKSUM;
                 break;
             case WAIT_CHECKSUM:
-                uint8_t calculatedChecksum = LINUtils::getChecksum(&this->currID, this->currFrame);
+                uint8_t calculatedChecksum = LINUtils::getChecksum(&currID, currFrame);
                 if (calculatedChecksum == *b) {
                     // response is good, send to datastore
                     l->log(
                             "received response: "
-                            + String(this->currID, HEX)
+                            + String(currID, HEX)
                             + " - "
-                            + DataStore::frameToString(this->currFrame)
+                            + DataStore::frameToString(currFrame)
                             + " - "
                             + String(calculatedChecksum, HEX)
                     );
                     // TODO modify buttons at receive?
-                    this->ds->saveFrame(this->currID, this->currFrame);
+                    ds->saveFrame(currID, currFrame);
                     mod->testButtons();
                 } else {
                     // checksum is bad, log error
                     l->log(
                             "Checksum error ID "
-                            + String(this->currID, HEX)
+                            + String(currID, HEX)
                             + " - "
-                            + DataStore::frameToString(this->currFrame)
+                            + DataStore::frameToString(currFrame)
                             + " - "
                             + String(calculatedChecksum, HEX)
                             + " - "
