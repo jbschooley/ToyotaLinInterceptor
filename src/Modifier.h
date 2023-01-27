@@ -16,7 +16,7 @@ public:
     const uint8_t BUTTON_OFF[2] =           {0, 0x02};
     const uint8_t BUTTON_AUTO[2] =          {0, 0x08};
     const uint8_t BUTTON_SYNC[2] =          {3, 0x20};
-    const uint8_t BUTTON_AC[2] =            {0, 0x80};
+    const uint8_t BUTTON_AC[2] =            {1, 0x80};
     const uint8_t BUTTON_FRONT_DEFROST[2] = {3, 0x80};
     const uint8_t BUTTON_REAR_DEFROST[2] =  {3, 0x40};
     const uint8_t BUTTON_ECO[2] =           {1, 0x40};
@@ -24,13 +24,18 @@ public:
     const uint8_t BUTTON_FAN_UP[2] =        {1, 0x3c};
     const uint8_t BUTTON_MODE[2] =          {2, 0x1c};
     const uint8_t BUTTON_RECYCLE[2] =       {6, 0xc0};
-    const uint8_t BUTTON_S_MODE[2] =        {1, 0x80};
+    const uint8_t BUTTON_S_MODE[2] =        {0, 0x80};
 
     const uint8_t TEMP_DRIVER[2] =          {4, 0x01};
     const uint8_t TEMP_PASSENGER[2] =       {5, 0x01};
 
+    enum Temp {
+        TEMP_LO = 59,
+        TEMP_HI = 86,
+    };
+
     explicit Modifier(DataStore* ds) {
-        this->l = new Logger("Modifier", false);
+        this->l = new Logger("Modifier", true);
         this->ds = ds;
     }
 
@@ -60,8 +65,10 @@ public:
     // TEST STUFF
 
     void testButtons() {
-        testDefrostAfter3s();
+//        testDefrostAfter3s();
 //        testIncreaseTemp();
+        printTempEvery1s();
+        setDefrostSettings();
     }
 
     bool testDefrostChanged = false;
@@ -70,9 +77,95 @@ public:
             testDefrostChanged = true;
             l->log("testDefrostAfter3s");
             l->log("before: " + DataStore::frameToString(ds->x39));
-            pressButton(BUTTON_FRONT_DEFROST);
+//            pressButton(BUTTON_FRONT_DEFROST);
+            setDefrostSettings();
             l->log("after:  " + DataStore::frameToString(ds->x39Mod));
-            l->log("checksum: " + String(LINController::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
+//            l->log("checksum: " + String(LINController::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
+        }
+    }
+
+    int getTempDelta(const uint8_t* currTemp, int newTemp) {
+        int delta = newTemp - calcTemp(*currTemp);
+        if (delta > 15) delta = 15;
+        else if (delta < -15) delta = -15;
+        return delta;
+    }
+
+    bool defrostSettingsSet = false;
+    bool oneTimeSettingsSet = false;
+    void setDefrostSettings() {
+        if (!defrostSettingsSet) {
+            bool settingsChangedThisRound = false;
+
+            if (!oneTimeSettingsSet) {
+                // defrost
+                if (!bool(ds->xB1[2] & 0x08)) {
+                    pressButton(BUTTON_FRONT_DEFROST);
+                }
+                if (!bool(ds->xB1[3] & 0x40)) {
+                    pressButton(BUTTON_REAR_DEFROST);
+                }
+
+                // sync on
+                if (!bool(ds->xB1[3] & 0x20)) {
+                    pressButton(BUTTON_SYNC);
+                }
+
+                // s-mode off
+                if (bool(ds->xB1[0] & 0x80)) {
+                    pressButton(BUTTON_S_MODE);
+                }
+
+                // eco off
+                if (bool(ds->xB1[0] & 0x08)) {
+                    pressButton(BUTTON_ECO);
+                }
+
+                oneTimeSettingsSet = true;
+            }
+
+            // temp
+
+            int driverTempDelta = getTempDelta(&ds->xB1[4], TEMP_HI);
+            int passengerTempDelta = getTempDelta(&ds->xB1[5], TEMP_HI);
+            if (driverTempDelta != 0) {
+                changeTemp(TEMP_DRIVER, driverTempDelta);
+                settingsChangedThisRound = true;
+            }
+//            if (passengerTempDelta != 0) {
+//                changeTemp(TEMP_PASSENGER, passengerTempDelta);
+//                settingsChangedThisRound = true;
+//            }
+
+            // fan
+            if ((ds->xB1[1] & 7) < 7) {
+                pressButton(BUTTON_FAN_UP);
+                settingsChangedThisRound = true;
+            }
+
+            // keep changing if not complete
+            if (!settingsChangedThisRound) {
+                defrostSettingsSet = true;
+            }
+        }
+    }
+
+    static uint8_t calcTemp(uint8_t hexTemp) {
+        if (hexTemp == 0) {
+            return TEMP_LO;
+        } else if (hexTemp >= 0x66) {
+            return hexTemp - 0x2a;
+        } else {
+            return hexTemp + 0x1f;
+        }
+    }
+
+    unsigned long lastTempMillis = 0;
+    void printTempEvery1s() {
+        if (millis() - lastTempMillis > 1000) {
+            l->log("temp: " + String(calcTemp(ds->xB1[4])) + " " + String(calcTemp(ds->xB1[5])));
+//            l->log("defrost: " + String(bool(ds->xB1[2] & 0x08)));
+            lastTempMillis = millis();
         }
     }
 
