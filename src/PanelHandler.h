@@ -96,7 +96,7 @@ public:
                     );
                     // TODO modify buttons at receive?
                     ds->saveFrame(currID, currFrame);
-                    mod->testButtons();
+//                    mod->testButtons();
                 } else {
                     // checksum is bad, log error
                     l->log(

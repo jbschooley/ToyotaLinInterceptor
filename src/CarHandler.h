@@ -87,6 +87,8 @@ public:
                     ds->saveFrame(currID, currFrame);
                     // if car sent climate status, forward to panel
                     if (currID == 0xb1) panelHandlerSM->sendMsg(currID);
+                    // TODO modify buttons after climate status received
+                    mod->testButtons();
 //                    l->log(
 //                            "saved data: "
 //                            + String(currID, HEX)
