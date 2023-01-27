@@ -2,47 +2,21 @@
 // Created by Jacob on 1/24/2023.
 //
 
-#ifndef TOYOTALININTERCEPTOR_PANELHANDLERSM_H
-#define TOYOTALININTERCEPTOR_PANELHANDLERSM_H
+#ifndef TOYOTALININTERCEPTOR_PANELHANDLER_H
+#define TOYOTALININTERCEPTOR_PANELHANDLER_H
 
-class PanelHandlerSM {
+#include "Handler.h"
+
+class PanelHandler : protected Handler {
 private:
-    enum PanelState {
-        IDLE,
-        WAIT_ID,
-        WAIT_BYTE_0,
-        WAIT_BYTE_1,
-        WAIT_BYTE_2,
-        WAIT_BYTE_3,
-        WAIT_BYTE_4,
-        WAIT_BYTE_5,
-        WAIT_BYTE_6,
-        WAIT_BYTE_7,
-        WAIT_CHECKSUM,
-    };
-
-    Logger* l;
-    DataStore* ds;
-    Modifier* mod;
-    HardwareSerial* ser;
-    PanelState state = IDLE;
-
-    // current frame to store response
-    uint8_t currID = 0;
-    uint8_t currFrame[8]{};
-
     // track next message to send
     unsigned long lastMillis = 0;
 
 public:
     uint8_t nextMsg = 0xb1;
 
-    explicit PanelHandlerSM(DataStore* ds, Modifier* mod, HardwareSerial* ser) {
-        this->l = new Logger("Panel", false);
-        this->ds = ds;
-        this->mod = mod;
-        this->ser = ser;
-        ser->begin(19200);
+    explicit PanelHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
+            : Handler(ds, mod, ser, new Logger("Panel", false)){
     }
 
     void tick() {
@@ -109,14 +83,7 @@ public:
         }
     }
 
-    void handleRead() {
-        while (ser->available()) {
-            uint8_t b = ser->read();
-            handleByte(&b);
-        }
-    }
-
-    void handleByte(const uint8_t* b) {
+    void handleByte(const uint8_t* b) override {
         switch (this->state) {
             case IDLE:
                 if (*b == 0x55) this->state = WAIT_ID;
@@ -196,9 +163,6 @@ public:
         }
     }
 
-    void reset() {
-        this->state = IDLE;
-    }
 };
 
-#endif //TOYOTALININTERCEPTOR_PANELHANDLERSM_H
+#endif //TOYOTALININTERCEPTOR_PANELHANDLER_H

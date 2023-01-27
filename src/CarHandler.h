@@ -2,58 +2,20 @@
 // Created by Jacob on 1/23/2023.
 //
 
-#ifndef TOYOTALININTERCEPTOR_CARHANDLERSM_H
-#define TOYOTALININTERCEPTOR_CARHANDLERSM_H
+#ifndef TOYOTALININTERCEPTOR_CARHANDLER_H
+#define TOYOTALININTERCEPTOR_CARHANDLER_H
 
-#include "PanelHandlerSM.h"
+#include "PanelHandler.h"
+#include "Handler.h"
 
-class CarHandlerSM {
-private:
-    enum CarState {
-        IDLE,
-        WAIT_ID,
-        WAIT_BYTE_0,
-        WAIT_BYTE_1,
-        WAIT_BYTE_2,
-        WAIT_BYTE_3,
-        WAIT_BYTE_4,
-        WAIT_BYTE_5,
-        WAIT_BYTE_6,
-        WAIT_BYTE_7,
-        WAIT_CHECKSUM,
-    };
-
-    Logger* l;
-    DataStore* ds;
-    Modifier* mod;
-    HardwareSerial* ser;
-    CarState state = IDLE;
-
-    // current frame to store received data
-    uint8_t currID = 0;
-    uint8_t currFrame[8]{};
-
+class CarHandler : public Handler {
 public:
-    PanelHandlerSM* panelHandlerSM;
+    PanelHandler* panelHandlerSM;
 
-    explicit CarHandlerSM(DataStore* ds, Modifier* mod, HardwareSerial* ser) {
-        this->l = new Logger("Car", false);
-        this->ds = ds;
-        this->mod = mod;
-        this->ser = ser;
-        ser->begin(19200);
-    }
+    explicit CarHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
+            : Handler(ds, mod, ser, new Logger("Car", false)) {}
 
-    void handleRead() {
-//        l->log("handleRead: " + String(ser->available()) + " bytes available");
-        while (ser->available()) {
-            uint8_t b = ser->read();
-//            l->log("read byte: " + String(b, HEX));
-            handleByte(&b);
-        }
-    }
-
-    void handleByte(const uint8_t* b) {
+    void handleByte(const uint8_t* b) override {
         switch (this->state) {
             case IDLE:
                 if (*b == 0x55) this->state = WAIT_ID;
@@ -151,9 +113,6 @@ public:
         }
     }
 
-    void reset() {
-        this->state = IDLE;
-    }
 };
 
-#endif //TOYOTALININTERCEPTOR_CARHANDLERSM_H
+#endif //TOYOTALININTERCEPTOR_CARHANDLER_H

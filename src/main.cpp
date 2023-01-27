@@ -4,8 +4,8 @@
 #include "Logger.h"
 #include "DataStore.h"
 #include "Modifier.h"
-#include "CarHandlerSM.h"
-#include "PanelHandlerSM.h"
+#include "CarHandler.h"
+#include "PanelHandler.h"
 
 #define SerialUSB Serial
 #define SerialCar Serial1
@@ -19,8 +19,8 @@ unsigned long baud = 19200;
 Logger* l;
 DataStore* ds;
 Modifier* mod;
-CarHandlerSM* carHandlerSM;
-PanelHandlerSM* panelHandlerSM;
+CarHandler* carHandlerSM;
+PanelHandler* panelHandlerSM;
 
 void setup() {
 
@@ -32,8 +32,8 @@ void setup() {
     l->log("begin setup");
     ds = new DataStore();
     mod = new Modifier(ds);
-    carHandlerSM = new CarHandlerSM(ds, mod, &SerialCar);
-    panelHandlerSM = new PanelHandlerSM(ds, mod, &SerialPanel);
+    carHandlerSM = new CarHandler(ds, mod, &SerialCar);
+    panelHandlerSM = new PanelHandler(ds, mod, &SerialPanel);
     carHandlerSM->panelHandlerSM = panelHandlerSM;
 
     // enable lin chips
