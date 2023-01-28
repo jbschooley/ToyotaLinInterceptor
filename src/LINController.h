@@ -26,14 +26,14 @@ public:
         return ser->read();
     }
 
-//    AI generated, might be more efficient but needs testing
-//    static uint8_t getChecksum(const uint8_t* frame, uint8_t frameSize) {
-//        uint8_t sum = 0;
-//        for (int i=0; i<8; i++) {
-//            sum += frame[i];
-//        }
-//        return (uint8_t) (0xFF - sum);
-//    }
+    // AI generated, might be more efficient but needs testing
+    //static uint8_t getChecksum(const uint8_t* frame, uint8_t frameSize) {
+    //    uint8_t sum = 0;
+    //    for (int i=0; i<8; i++) {
+    //        sum += frame[i];
+    //    }
+    //    return (uint8_t) (0xFF - sum);
+    //}
 
     size_t writeBreak() {
         ser->flush();

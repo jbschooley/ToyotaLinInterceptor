@@ -65,8 +65,8 @@ public:
     // TEST STUFF
 
     void testButtons() {
-//        testDefrostAfter3s();
-//        testIncreaseTemp();
+        //testDefrostAfter3s();
+        //testIncreaseTemp();
         printTempEvery1s();
         setDefrostSettings();
     }
@@ -77,10 +77,10 @@ public:
             testDefrostChanged = true;
             l->log("testDefrostAfter3s");
             l->log("before: " + DataStore::frameToString(ds->x39));
-//            pressButton(BUTTON_FRONT_DEFROST);
+            //pressButton(BUTTON_FRONT_DEFROST);
             setDefrostSettings();
             l->log("after:  " + DataStore::frameToString(ds->x39Mod));
-//            l->log("checksum: " + String(LINController::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
+            //l->log("checksum: " + String(LINController::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
         }
     }
 
@@ -164,7 +164,7 @@ public:
     void printTempEvery1s() {
         if (millis() - lastTempMillis > 1000) {
             l->log("temp: " + String(calcTemp(ds->xB1[4])) + " " + String(calcTemp(ds->xB1[5])));
-//            l->log("defrost: " + String(bool(ds->xB1[2] & 0x08)));
+            //l->log("defrost: " + String(bool(ds->xB1[2] & 0x08)));
             lastTempMillis = millis();
         }
     }

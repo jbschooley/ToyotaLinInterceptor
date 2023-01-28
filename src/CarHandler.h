@@ -76,14 +76,14 @@ public:
                 if (calculatedChecksum == *b) {
                     // this is reached after frame has been received and verified
                     // print frame to serial
-//                    l->log(
-//                            "received data: "
-//                            + String(currID, HEX)
-//                            + " - "
-//                            + DataStore::frameToString(currFrame)
-//                            + " - "
-//                            + String(calculatedChecksum, HEX)
-//                    );
+                    //l->log(
+                    //        "received data: "
+                    //        + String(currID, HEX)
+                    //        + " - "
+                    //        + DataStore::frameToString(currFrame)
+                    //        + " - "
+                    //        + String(calculatedChecksum, HEX)
+                    //);
                     ds->saveFrame(currID, currFrame);
                     // if car sent climate status, forward to panel
                     if (currID == 0xb1) {
@@ -91,14 +91,14 @@ public:
                         // TODO modify buttons after climate status received
                         mod->testButtons();
                     }
-//                    l->log(
-//                            "saved data: "
-//                            + String(currID, HEX)
-//                            + " - "
-//                            + DataStore::frameToString(ds->getFrame(currID))
-//                            + " to "
-//                            + String((int)ds->getFrame(currID), HEX)
-//                    );
+                    //l->log(
+                    //        "saved data: "
+                    //        + String(currID, HEX)
+                    //        + " - "
+                    //        + DataStore::frameToString(ds->getFrame(currID))
+                    //        + " to "
+                    //        + String((int)ds->getFrame(currID), HEX)
+                    //);
                 } else {
                     // if checksum is bad, log error
                     l->log(

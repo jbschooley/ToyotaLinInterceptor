@@ -34,7 +34,7 @@ void setup() {
     mod = new Modifier(ds);
     carHandler = new CarHandler(ds, mod, &SerialCar);
     panelHandler = new PanelHandler(ds, mod, &SerialPanel);
-    carHandler->panelHandlerSM = panelHandler;
+    carHandler->panelHandler = panelHandler;
 
     // enable lin chips
     pinMode(PinEnPanel, OUTPUT);
@@ -44,9 +44,9 @@ void setup() {
 
     l->log("end setup");
 
-//    l->log("testing defrost");
-//    mod->testTemp();
-//    mod->printButton(mod->BUTTON_OFF);
+    //l->log("testing defrost");
+    //mod->testTemp();
+    //mod->printButton(mod->BUTTON_OFF);
 }
 
 bool testPanelChanged = false;
@@ -60,5 +60,5 @@ bool testPanelChanged = false;
 void loop() {
     carHandler->handleRead();
     panelHandler->handleRead();
-    // testChangePanelAfter3s();
+    //testChangePanelAfter3s();
 }
