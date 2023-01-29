@@ -24,7 +24,7 @@ private:
     const uint8_t BUTTON_FAN_UP[2] =        {1, 0x3c};
     const uint8_t BUTTON_MODE[2] =          {2, 0x1c};
     const uint8_t BUTTON_RECYCLE[2] =       {6, 0xc0};
-    const uint8_t BUTTON_S_MODE[2] =        {0, 0x80}; // TODO does not seem to be correct, need to monitor button again
+    const uint8_t BUTTON_S_MODE[2] =        {2, 0x80};
     const uint8_t ZONE_DRIVER[2] =          {4, 0x01};
     const uint8_t ZONE_PASSENGER[2] =       {5, 0x01};
 
@@ -32,6 +32,7 @@ private:
     bool statusFrontDefrost() { return bool(ds->xB1[2] & 0x08); }
     bool statusRearDefrost() { return bool(ds->xB1[3] & 0x40); }
     bool statusSync() { return bool(ds->xB1[3] & 0x20); }
+    bool statusAC() { return bool(ds->xB1[7] & 0x01); }
     bool statusEco() { return bool(ds->xB1[0] & 0x08); }
     bool statusSMode() { return bool(ds->xB1[0] & 0x80); }
     int statusFanSpeed() { return ds->xB1[1] & 7; }
@@ -121,7 +122,7 @@ public:
     void testButtons() {
         //testDefrostAfter3s();
         //testIncreaseTemp();
-        printTempEvery1s();
+        //printTempEvery1s();
         setDefrostSettings();
     }
 
@@ -158,6 +159,9 @@ public:
 
                 // sync on
                 if (!statusSync()) { pressButton(BUTTON_SYNC); }
+
+                // a/c on
+                if (!statusAC()) { pressButton(BUTTON_AC); }
 
                 // s-mode off
                 if (statusSMode()) { pressButton(BUTTON_S_MODE); }

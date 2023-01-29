@@ -11,8 +11,7 @@ class PanelHandler : public Handler {
 public:
 
     explicit PanelHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
-            : Handler(ds, mod, ser, new Logger("Panel", false)){
-    }
+            : Handler(ds, mod, ser, new Logger("Panel", false)) {}
 
     void sendMsg(uint8_t id) {
         // send message
