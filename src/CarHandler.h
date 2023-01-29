@@ -10,7 +10,7 @@
 
 class CarHandler : public Handler {
 public:
-    PanelHandler* panelHandlerSM{};
+    PanelHandler* panelHandler{};
 
     explicit CarHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
             : Handler(ds, mod, ser, new Logger("Car", false)) {}
@@ -36,7 +36,7 @@ public:
                 }
                 // Request button status from panel if car sent 0x78
                 // 0x78 is 3 messages before 0x39 for buffer; seems to be fastest and most reliable
-                if (currID == 0x78) panelHandlerSM->sendMsg(0x39);
+                if (currID == 0x78) panelHandler->sendMsg(0x39);
                 break;
             case WAIT_BYTE_0:
                 currFrame[0] = *b;
@@ -87,7 +87,7 @@ public:
                     ds->saveFrame(currID, currFrame);
                     // if car sent climate status, forward to panel
                     if (currID == 0xb1) {
-                        panelHandlerSM->sendMsg(currID);
+                        panelHandler->sendMsg(currID);
                         // TODO modify buttons after climate status received
                         mod->testButtons();
                     }

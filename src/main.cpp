@@ -2,6 +2,7 @@
 #include <HardwareSerial.h>
 #include "LINController.h"
 #include "Logger.h"
+#include "Timer.h"
 #include "DataStore.h"
 #include "Modifier.h"
 #include "CarHandler.h"
