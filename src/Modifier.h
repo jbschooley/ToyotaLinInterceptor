@@ -123,7 +123,8 @@ public:
         //testDefrostAfter3s();
         //testIncreaseTemp();
         //printTempEvery1s();
-        setDefrostSettings();
+        //setDefrostSettings();
+        presetAfter1s();
     }
 
     bool testDefrostChanged = false;
@@ -139,6 +140,13 @@ public:
         }
     }
 
+    void presetAfter1s() {
+        // TODO check for remote start here
+        if (millis() > 1000) {
+            setDefrostSettings();
+        }
+    }
+
     int getTempDelta(const uint8_t* currTemp, int newTemp) {
         int delta = newTemp - calcTemp(*currTemp);
         if (delta > 15) delta = 15;
@@ -147,12 +155,12 @@ public:
     }
 
     bool defrostSettingsSet = false;
-    bool oneTimeSettingsSet = false;
+    bool oneTimeButtonsPressed = false;
     void setDefrostSettings() {
         if (!defrostSettingsSet) {
             bool settingsChangedThisRound = false;
 
-            if (!oneTimeSettingsSet) {
+            if (!oneTimeButtonsPressed) {
                 // defrost
                 if (!statusFrontDefrost()) { pressButton(BUTTON_FRONT_DEFROST); }
                 if (!statusRearDefrost()) { pressButton(BUTTON_REAR_DEFROST); }
@@ -169,7 +177,7 @@ public:
                 // eco off
                 if (statusEco()) { pressButton(BUTTON_ECO); }
 
-                oneTimeSettingsSet = true;
+                oneTimeButtonsPressed = true;
             }
 
             // temp
