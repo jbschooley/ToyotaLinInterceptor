@@ -119,7 +119,7 @@ public:
 
     void presetAfter1s() {
         // TODO check for remote start here
-        if (millis() > 1000) {
+        if (millis() > 1500) {
             setDefrostSettings();
         }
     }
