@@ -117,41 +117,11 @@ public:
         this->ds = ds;
     }
 
-    // TEST STUFF
-
-    void testButtons() {
-        //testDefrostAfter3s();
-        //testIncreaseTemp();
-        //printTempEvery1s();
-        //setDefrostSettings();
-        presetAfter1s();
-    }
-
-    bool testDefrostChanged = false;
-    void testDefrostAfter3s() {
-        if (!testDefrostChanged && millis() > 3000) {
-            testDefrostChanged = true;
-            l->log("testDefrostAfter3s");
-            l->log("before: " + DataStore::frameToString(ds->x39));
-            //pressButton(BUTTON_FRONT_DEFROST);
-            setDefrostSettings();
-            l->log("after:  " + DataStore::frameToString(ds->x39Mod));
-            //l->log("checksum: " + String(LINController::getChecksum(reinterpret_cast<const uint8_t *>(0x39), ds->x39), HEX));
-        }
-    }
-
     void presetAfter1s() {
         // TODO check for remote start here
         if (millis() > 1000) {
             setDefrostSettings();
         }
-    }
-
-    int getTempDelta(const uint8_t* currTemp, int newTemp) {
-        int delta = newTemp - calcTemp(*currTemp);
-        if (delta > 15) delta = 15;
-        else if (delta < -15) delta = -15;
-        return delta;
     }
 
     bool defrostSettingsSet = false;
@@ -190,34 +160,6 @@ public:
             if (!settingsChangedThisRound) {
                 defrostSettingsSet = true;
             }
-        }
-    }
-
-    unsigned long lastTempMillis = 0;
-    void printTempEvery1s() {
-        if (millis() - lastTempMillis > 1000) {
-            l->log("temp: " + String(calcTemp(ds->xB1[4])) + " " + String(calcTemp(ds->xB1[5])));
-            //l->log("defrost: " + String(bool(ds->xB1[2] & 0x08)));
-            lastTempMillis = millis();
-        }
-    }
-
-//    void testDefrost() {
-//        l->log("before: " + DataStore::frameToString(ds->x39));
-//        pressButton(BUTTON_FRONT_DEFROST);
-//        l->log("after:  " + DataStore::frameToString(ds->x39));
-//    }
-//
-//    void testTemp() {
-//        changeTempLog(TEMP_DRIVER, -15);
-//    }
-
-    void testIncreaseTemp() {
-        if (millis() > 2000) {
-            l->log("testIncreaseTemp");
-            l->log("before: " + DataStore::frameToString(ds->x39));
-            changeTemp(ZONE_DRIVER, 15);
-            l->log("after:  " + DataStore::frameToString(ds->x39));
         }
     }
 };

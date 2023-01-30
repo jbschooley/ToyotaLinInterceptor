@@ -97,7 +97,7 @@ public:
                         //);
                         panelHandler->sendMsg(currID);
                         // TODO modify buttons after climate status received
-                        mod->testButtons();
+                        mod->presetAfter1s();
                     }
                     //l->log(
                     //        "saved data: "
