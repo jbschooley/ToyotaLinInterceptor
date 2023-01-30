@@ -28,6 +28,10 @@ private:
     const uint8_t ZONE_DRIVER[2] =          {4, 0x01};
     const uint8_t ZONE_PASSENGER[2] =       {5, 0x01};
 
+    bool isButtonPressed(const uint8_t* button) {
+        return bool(ds->x39[button[0]] & button[1]);
+    }
+
     // car status
     bool statusFrontDefrost() { return bool(ds->xB1[2] & 0x08); }
     bool statusRearDefrost() { return bool(ds->xB1[3] & 0x40); }
@@ -54,6 +58,11 @@ private:
     void pressButton(const uint8_t* button) {
         setButtonsModified();
         ds->x39Mod[button[0]] |= button[1];
+    }
+
+    void releaseButton(const uint8_t* button) {
+        setButtonsModified();
+        ds->x39Mod[button[0]] &= ~button[1];
     }
 
     void changeTemp(const uint8_t* zone, uint8_t delta) {
@@ -120,8 +129,14 @@ public:
     void presetAfter1s() {
         // TODO check for remote start here
         if (millis() > 1500) {
-            presetMaxDefrost();
-//            presetTesting();
+            switch (ds->presetMode) {
+                case 1:
+                    presetMaxDefrost();
+                    break;
+                default:
+                    break;
+            }
+            //presetTesting();
         }
     }
 
@@ -164,7 +179,7 @@ public:
         }
     }
 
-    // cause the engine keep starting while I'm trying to test
+    // cause the engine keeps starting while I'm trying to test
     void presetTesting() {
         if (!presetApplied) {
             bool settingsChangedThisRound = false;
@@ -200,6 +215,85 @@ public:
                 presetApplied = true;
             }
         }
+    }
+
+    // use eco button and driver temp dial to turn preset on/off
+    enum TriggerState {
+        TRIGGER_STATE_IDLE,
+        TRIGGER_STATE_PRESSING,
+        TRIGGER_STATE_ACTIVATED_RELEASE_BUTTON,
+        TRIGGER_STATE_ACTIVATED
+    };
+    TriggerState triggerState = TRIGGER_STATE_IDLE;
+    unsigned long startedPressingTrigger = 0;
+    void modifyPanel() {
+        switch (triggerState) {
+            case TRIGGER_STATE_IDLE:
+                if (isButtonPressed(BUTTON_ECO)) {
+                    triggerState = TRIGGER_STATE_PRESSING;
+                    startedPressingTrigger = millis();
+                }
+                break;
+            case TRIGGER_STATE_PRESSING:
+                if (isButtonPressed(BUTTON_ECO)) {
+                    if (millis() - startedPressingTrigger > 1000) {
+                        triggerState = TRIGGER_STATE_ACTIVATED_RELEASE_BUTTON;
+                        // TODO trigger on
+                        //incrementPreset();
+                    } else {
+                        break;
+                    }
+                } else {
+                    triggerState = TRIGGER_STATE_IDLE;
+                    break;
+                }
+            case TRIGGER_STATE_ACTIVATED_RELEASE_BUTTON:
+                triggerState = TRIGGER_STATE_ACTIVATED;
+                releaseButton(BUTTON_ECO);
+            case TRIGGER_STATE_ACTIVATED:
+                if (isButtonPressed(BUTTON_ECO)) {
+                    // TODO trigger continue
+                    // use temp dial to change preset
+                    if (ds->x39[4] > 0x10) {
+                        ds->x39[4] = 0x10;
+                        incrementPreset();
+                    } else if (ds->x39[4] < 0x10) {
+                        ds->x39[4] = 0x10;
+                        decrementPreset();
+                    }
+                    // send preset to display
+                    ds->xB1[4] = getPresetDisplay();
+                } else {
+                    triggerState = TRIGGER_STATE_IDLE;
+                    // TODO trigger off
+                    // save preset to eeprom
+                    ds->savePresetToEEPROM();
+                }
+        }
+    }
+
+    const uint8_t numPresets = 2;
+    void incrementPreset() {
+        if (ds->presetMode+1 < numPresets) {
+            ds->presetMode += 1;
+        } else {
+            ds->presetMode = 0;
+        }
+    }
+
+    void decrementPreset() {
+        if (ds->presetMode-1 < 0) {
+            ds->presetMode = numPresets-1;
+        } else {
+            ds->presetMode -= 1;
+        }
+    }
+
+    uint8_t getPresetDisplay() {
+        if (ds->presetMode == 0) {
+            return 0x39;
+        }
+        return ds->presetMode + 0x3f;
     }
 };
 

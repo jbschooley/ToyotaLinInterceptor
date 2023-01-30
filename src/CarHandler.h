@@ -44,6 +44,7 @@ public:
             //        + " - "
             //        + String(calculatedChecksum, HEX)
             //);
+            mod->modifyPanel();
             panelHandler->sendMsg(currID);
             // TODO modify buttons after climate status received
             mod->presetAfter1s();

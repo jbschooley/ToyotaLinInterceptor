@@ -5,6 +5,7 @@
 #ifndef TOYOTALININTERCEPTOR_DATASTORE_H
 #define TOYOTALININTERCEPTOR_DATASTORE_H
 
+#include <EEPROM.h>
 #include "Logger.h"
 
 class DataStore {
@@ -28,8 +29,13 @@ public:
 
     bool buttonsModifiedSinceLastSend = false;
 
+    // preset settings
+    const int presetAddressEEPROM = 0;
+    uint8_t presetMode = 0;
+
     DataStore() {
         this->l = new Logger("DataStore", false);
+        readPresetFromEEPROM();
     }
 
     void saveFrame(uint8_t id, uint8_t* frame) {
@@ -87,6 +93,14 @@ public:
             default:
                 return nullptr;
         }
+    }
+
+    void savePresetToEEPROM() const {
+        EEPROM.update(presetAddressEEPROM, presetMode);
+    }
+
+    void readPresetFromEEPROM() {
+        presetMode = EEPROM.read(presetAddressEEPROM);
     }
 
     static bool idIsData(uint8_t id) {
