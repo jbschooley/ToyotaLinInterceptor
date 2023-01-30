@@ -120,8 +120,8 @@ public:
     void presetAfter1s() {
         // TODO check for remote start here
         if (millis() > 1500) {
-            //presetMaxDefrost();
-            presetTesting();
+            presetMaxDefrost();
+//            presetTesting();
         }
     }
 
