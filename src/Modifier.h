@@ -120,14 +120,15 @@ public:
     void presetAfter1s() {
         // TODO check for remote start here
         if (millis() > 1500) {
-            setDefrostSettings();
+            //presetMaxDefrost();
+            presetTesting();
         }
     }
 
-    bool defrostSettingsSet = false;
+    bool presetApplied = false;
     bool oneTimeButtonsPressed = false;
-    void setDefrostSettings() {
-        if (!defrostSettingsSet) {
+    void presetMaxDefrost() {
+        if (!presetApplied) {
             bool settingsChangedThisRound = false;
 
             if (!oneTimeButtonsPressed) {
@@ -158,7 +159,45 @@ public:
 
             // keep changing if not complete
             if (!settingsChangedThisRound) {
-                defrostSettingsSet = true;
+                presetApplied = true;
+            }
+        }
+    }
+
+    // cause the engine keep starting while I'm trying to test
+    void presetTesting() {
+        if (!presetApplied) {
+            bool settingsChangedThisRound = false;
+
+            if (!oneTimeButtonsPressed) {
+                // defrost
+                if (!statusFrontDefrost()) { pressButton(BUTTON_FRONT_DEFROST); }
+                if (!statusRearDefrost()) { pressButton(BUTTON_REAR_DEFROST); }
+
+                // sync on
+                if (!statusSync()) { pressButton(BUTTON_SYNC); }
+
+                // a/c on
+                if (!statusAC()) { pressButton(BUTTON_AC); }
+
+                // s-mode off
+                if (statusSMode()) { pressButton(BUTTON_S_MODE); }
+
+                // eco off
+                if (statusEco()) { pressButton(BUTTON_ECO); }
+
+                oneTimeButtonsPressed = true;
+            }
+
+            // temp
+            settingsChangedThisRound |= setTemp(ZONE_DRIVER, 80);
+
+            // fan speed
+            settingsChangedThisRound |= setFan(2);
+
+            // keep changing if not complete
+            if (!settingsChangedThisRound) {
+                presetApplied = true;
             }
         }
     }
