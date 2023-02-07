@@ -5,6 +5,8 @@
 #include "Timer.h"
 #include "DataStore.h"
 #include "Modifier.h"
+#include "PresetController.h"
+#include "Menu.h"
 #include "CarHandler.h"
 #include "PanelHandler.h"
 
@@ -20,6 +22,9 @@
 Logger* l;
 DataStore* ds;
 Modifier* mod;
+PresetController* pc;
+Menu* menu;
+
 CarHandler* carHandler;
 PanelHandler* panelHandler;
 
@@ -33,7 +38,9 @@ void setup() {
     l->log("begin setup");
     ds = new DataStore();
     mod = new Modifier(ds);
-    carHandler = new CarHandler(ds, mod, &SerialCar);
+    pc = new PresetController(ds, mod);
+    menu = new Menu(ds, mod, pc);
+    carHandler = new CarHandler(ds, mod, menu, pc, &SerialCar);
     panelHandler = new PanelHandler(ds, mod, &SerialPanel);
     carHandler->panelHandler = panelHandler;
 

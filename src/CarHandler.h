@@ -9,11 +9,17 @@
 #include "Handler.h"
 
 class CarHandler : public Handler {
+private:
+    Menu* menu;
+    PresetController* pc;
 public:
     PanelHandler* panelHandler{};
 
-    explicit CarHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
-            : Handler(ds, mod, ser, new Logger("Car", false)) {}
+    explicit CarHandler(DataStore* ds, Modifier* mod, Menu* menu, PresetController* pc, HardwareSerial* ser)
+            : Handler(ds, mod, ser, new Logger("Car", false)) {
+        this->menu = menu;
+        this->pc = pc;
+    }
 
     void onReceiveID() override {
         if (DataStore::idIsData(currID)) {
@@ -44,10 +50,10 @@ public:
             //        + " - "
             //        + String(calculatedChecksum, HEX)
             //);
-            mod->modifyPanel();
+            menu->modifyPanel();
             panelHandler->sendMsg(currID);
             // TODO modify buttons after climate status received
-            mod->presetAfter1s();
+            pc->presetAfter1s();
         }
     }
 
