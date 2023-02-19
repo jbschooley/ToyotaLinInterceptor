@@ -7,6 +7,7 @@
 #include "Modifier.h"
 #include "PresetController.h"
 #include "Menu.h"
+#include "Toggle.h"
 #include "CarHandler.h"
 #include "PanelHandler.h"
 
@@ -24,6 +25,7 @@ DataStore* ds;
 Modifier* mod;
 PresetController* pc;
 Menu* menu;
+Toggle* toggle;
 
 CarHandler* carHandler;
 PanelHandler* panelHandler;
@@ -40,7 +42,8 @@ void setup() {
     mod = new Modifier(ds);
     pc = new PresetController(ds, mod);
     menu = new Menu(ds, mod, pc);
-    carHandler = new CarHandler(ds, mod, menu, pc, &SerialCar);
+    toggle = new Toggle(ds, mod, pc);
+    carHandler = new CarHandler(ds, mod, menu, toggle, pc, &SerialCar);
     panelHandler = new PanelHandler(ds, mod, &SerialPanel);
     carHandler->panelHandler = panelHandler;
 
