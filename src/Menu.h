@@ -43,9 +43,11 @@ public:
             case TRIGGER_STATE_PRESSING:
                 //l->log("TRIGGER_STATE_PRESSING");
                 if (mod->isButtonPressed(mod->BUTTON_ECO)) {
-                    if (millis() - startedPressingTrigger > 1000) {
+                    if (millis() - startedPressingTrigger > 400) {
                         triggerState = TRIGGER_STATE_ACTIVATED_RELEASE_BUTTON;
                         // TODO trigger on
+                        if (ds->presetMode == 0) ds->presetMode = 1;
+                        else ds->presetMode = 0;
                     } else {
                         break;
                     }
@@ -62,14 +64,6 @@ public:
                 //l->log("TRIGGER_STATE_ACTIVATED");
                 if (mod->isButtonPressed(mod->BUTTON_ECO)) {
                     // TODO trigger continue
-                    // use temp dial to change preset
-                    if (ds->x39[4] > 0x10) {
-                        ds->x39[4] = 0x10;
-                        incrementPreset();
-                    } else if (ds->x39[4] < 0x10) {
-                        ds->x39[4] = 0x10;
-                        decrementPreset();
-                    }
                     // send preset to display
                     ds->xB1[4] = displayPreset();
                 } else {
