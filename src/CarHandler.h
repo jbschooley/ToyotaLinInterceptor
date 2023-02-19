@@ -52,8 +52,8 @@ public:
             //        + " - "
             //        + String(calculatedChecksum, HEX)
             //);
-            menu->modifyPanel();
-            toggle->modifyPanel();
+            menu->run();
+            toggle->run();
             panelHandler->sendMsg(currID);
             // TODO modify buttons after climate status received
             pc->presetAfter1s();
