@@ -18,12 +18,13 @@ public:
     }
 
     void on() override {
-        if (ds->presetMode == 0) ds->presetMode = 1;
-        else ds->presetMode = 0;
+        //if (!ds->presetEnabled) ds->presetMode = true;
+        //else ds->presetMode = false;
+        ds->presetEnabled = !ds->presetEnabled;
     }
 
     void hold() override {
-        ds->xB1[4] = displayPreset();
+        ds->xB1[4] = displayEnabled();
     }
 
     void off() override {
@@ -32,8 +33,8 @@ public:
         ds->savePresetToEEPROM();
     }
 
-    uint8_t displayPreset() {
-        if (ds->presetMode == 0) {
+    uint8_t displayEnabled() {
+        if (!ds->presetEnabled) {
             return 0x39;
         }
         return ds->presetMode + 0x3f;

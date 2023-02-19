@@ -38,15 +38,15 @@ public:
 
     const uint8_t numPresets = 2;
     void incrementPreset() {
-        if (ds->presetMode < numPresets) {
+        if (ds->presetMode > 0 && ds->presetMode < numPresets) {
             ds->presetMode += 1;
         } else {
-            ds->presetMode = 0;
+            ds->presetMode = 1;
         }
     }
 
     void decrementPreset() {
-        if (ds->presetMode-1 < 0) {
+        if (ds->presetMode <= 1) {
             ds->presetMode = numPresets;
         } else {
             ds->presetMode -= 1;

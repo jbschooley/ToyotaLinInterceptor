@@ -30,7 +30,9 @@ public:
     bool buttonsModifiedSinceLastSend = false;
 
     // preset settings
-    const int presetAddressEEPROM = 0;
+    const int presetEnabledAddress = 0;
+    const int presetModeAddress = 1;
+    bool presetEnabled = true;
     uint8_t presetMode = 0;
 
     DataStore() {
@@ -96,11 +98,13 @@ public:
     }
 
     void savePresetToEEPROM() const {
-        EEPROM.update(presetAddressEEPROM, presetMode);
+        EEPROM.update(presetEnabledAddress, presetEnabled);
+        EEPROM.update(presetModeAddress, presetMode);
     }
 
     void readPresetFromEEPROM() {
-        presetMode = EEPROM.read(presetAddressEEPROM);
+        presetEnabled = EEPROM.read(presetEnabledAddress);
+        presetMode = EEPROM.read(presetModeAddress);
     }
 
     static bool idIsData(uint8_t id) {
