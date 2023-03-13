@@ -38,6 +38,12 @@ public:
         }
     }
 
+    void cancel() {
+        l.log("Cancelling preset");
+        oneTimeButtonsPressed = true;
+        presetApplied = true;
+    }
+
     virtual void setButtons() {}
     virtual bool setTempAndFan() {
         return false;

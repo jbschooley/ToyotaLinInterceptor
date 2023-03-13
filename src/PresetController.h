@@ -50,6 +50,12 @@ public:
             preset->activate();
         }
     }
+
+    void cancelPreset() {
+        if (preset != nullptr) {
+            preset->cancel();
+        }
+    }
 };
 
 #endif //TOYOTALININTERCEPTOR_PRESETCONTROLLER_H

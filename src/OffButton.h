@@ -12,12 +12,15 @@ private:
 
 public:
     OffButton(DataStore* ds, Modifier* mod, PresetController* pc)
-            : Button(mod, mod->BUTTON_OFF, new Logger("OffButton", true)) {
+            : Button(mod, mod->BUTTON_OFF, new Logger("OffButton", false)) {
         this->ds = ds;
         this->pc = pc;
     }
 
     void press() override {
+        // cancel preset
+        pc->cancelPreset();
+        // turn off rear defrost
         if (mod->statusRearDefrost()) {
             mod->pressButton(mod->BUTTON_REAR_DEFROST);
         }
