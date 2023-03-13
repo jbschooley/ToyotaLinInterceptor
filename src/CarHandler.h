@@ -12,14 +12,16 @@ class CarHandler : public Handler {
 private:
     Menu* menu;
     Toggle* toggle;
+    OffButton* offButton;
     PresetController* pc;
 public:
     PanelHandler* panelHandler{};
 
-    explicit CarHandler(DataStore* ds, Modifier* mod, Menu* menu, Toggle* toggle, PresetController* pc, HardwareSerial* ser)
+    explicit CarHandler(DataStore* ds, Modifier* mod, Menu* menu, Toggle* toggle, OffButton* offButton, PresetController* pc, HardwareSerial* ser)
             : Handler(ds, mod, ser, new Logger("Car", false)) {
         this->menu = menu;
         this->toggle = toggle;
+        this->offButton = offButton;
         this->pc = pc;
     }
 
@@ -54,6 +56,7 @@ public:
             //);
             menu->run();
             toggle->run();
+            offButton->run();
             panelHandler->sendMsg(currID);
             // TODO modify buttons after climate status received
             pc->presetAfter1s();

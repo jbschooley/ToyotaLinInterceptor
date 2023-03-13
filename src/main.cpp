@@ -9,6 +9,7 @@
 #include "Button.h"
 #include "Menu.h"
 #include "Toggle.h"
+#include "OffButton.h"
 #include "CarHandler.h"
 #include "PanelHandler.h"
 
@@ -27,6 +28,7 @@ Modifier* mod;
 PresetController* pc;
 Menu* menu;
 Toggle* toggle;
+OffButton* offButton;
 
 CarHandler* carHandler;
 PanelHandler* panelHandler;
@@ -44,7 +46,8 @@ void setup() {
     pc = new PresetController(ds, mod);
     menu = new Menu(ds, mod, pc);
     toggle = new Toggle(ds, mod, pc);
-    carHandler = new CarHandler(ds, mod, menu, toggle, pc, &SerialCar);
+    offButton = new OffButton(ds, mod, pc);
+    carHandler = new CarHandler(ds, mod, menu, toggle, offButton, pc, &SerialCar);
     panelHandler = new PanelHandler(ds, mod, &SerialPanel);
     carHandler->panelHandler = panelHandler;
 

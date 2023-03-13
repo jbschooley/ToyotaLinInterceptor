@@ -13,7 +13,7 @@ private:
     bool oneTimeButtonsPressed = false;
 
 protected:
-    Logger l = Logger("Preset");
+    Logger l = Logger("Preset", false);
     Modifier* mod;
 
 public:
