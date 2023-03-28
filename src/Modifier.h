@@ -19,17 +19,6 @@ private:
         }
     }
 
-    //void changeTemp(const uint8_t* zone, uint8_t delta) {
-    //    setButtonsModified();
-    //    ds->x39Mod[zone[0]] += zone[1] * delta;
-    //}
-
-    //void changeTempLog(const uint8_t* zone, uint8_t delta) {
-    //    l->log("before: " + DataStore::frameToString(ds->x39));
-    //    changeTemp(zone, delta);
-    //    l->log("after:  " + DataStore::frameToString(ds->x39));
-    //}
-
     static uint8_t calcTemp(uint8_t hexTemp) {
         if (hexTemp == 0) {
             return TEMP_LO;
@@ -73,8 +62,6 @@ public:
     const uint8_t BUTTON_MODE[2] =          {2, 0x1c};
     const uint8_t BUTTON_RECYCLE[2] =       {6, 0xc0};
     const uint8_t BUTTON_S_MODE[2] =        {2, 0x80};
-    //const uint8_t ZONE_DRIVER[2] =          {4, 0x01};
-    //const uint8_t ZONE_PASSENGER[2] =       {5, 0x01};
     const uint8_t ZONE_DRIVER[2] =          {4, 0x10};
     const uint8_t ZONE_PASSENGER[2] =       {5, 0x90};
 
@@ -112,7 +99,6 @@ public:
         int delta = getTempDelta(statusTemp(zone), newTemp);
         if (delta != 0) {
             setButtonsModified();
-            //ds->x39Mod[zone[0]] += zone[1] * delta;
             ds->x39Mod[zone[0]] = zone[1] + delta;
             return true;
         }
