@@ -1,6 +1,10 @@
-//
-// Created by Jacob on 2/6/2023.
-//
+/**
+ * This preset enables both front and rear defrosters, sets fan speed and
+ * temp to max, and modifies other options that could prevent the defrost
+ * from working properly.
+ *
+ * @author Jacob Schooley
+ */
 
 #ifndef TOYOTALININTERCEPTOR_PRESETMAXDEFROST_H
 #define TOYOTALININTERCEPTOR_PRESETMAXDEFROST_H

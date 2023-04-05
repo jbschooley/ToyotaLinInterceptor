@@ -1,6 +1,9 @@
-//
-// Created by Jacob on 2/6/2023.
-//
+/**
+ * This preset is just used for testing, because otherwise I get too hot
+ * when sitting in the car playing with this thing.
+ *
+ * @author Jacob Schooley
+ */
 
 #ifndef TOYOTALININTERCEPTOR_PRESETTESTING_H
 #define TOYOTALININTERCEPTOR_PRESETTESTING_H

@@ -1,6 +1,8 @@
-//
-// Created by Jacob on 2/6/2023.
-//
+/**
+ * Serves as the template for a preset and defines how the preset is applied.
+ *
+ * @author Jacob Schooley
+ */
 
 #ifndef TOYOTALININTERCEPTOR_PRESET_H
 #define TOYOTALININTERCEPTOR_PRESET_H
@@ -9,7 +11,14 @@
 
 class Preset {
 private:
+    /**
+     * Whether the preset has been successfully applied
+     */
     bool presetApplied = false;
+    /**
+     * Whether the buttons that only need to be pressed once during the
+     * activation process have been pressed
+     */
     bool oneTimeButtonsPressed = false;
 
 protected:
@@ -21,9 +30,15 @@ public:
         this->mod = mod;
     }
 
+    /**
+     * Activate the preset. If it has already been activated, do nothing.
+     * To activate, the buttons that should only be pressed once are set to
+     * pressed for one frame. The temperature and fan speed bits are modified
+     * for each subsequent frame until the target temperature and fan speed
+     * are reached.
+     */
     void activate() {
         l.log("Activating preset");
-        //this->mod = mod;
         if (!presetApplied) {
             if (!oneTimeButtonsPressed) {
                 l.log("Setting buttons");
@@ -38,13 +53,24 @@ public:
         }
     }
 
+    /**
+     * Cancel activation of the preset if it is in progress.
+     */
     void cancel() {
         l.log("Cancelling preset");
         oneTimeButtonsPressed = true;
         presetApplied = true;
     }
 
+    /**
+     * Run once during preset application.
+     */
     virtual void setButtons() {}
+
+    /**
+     * Run repeatedly until preset application has completed.
+     * @return
+     */
     virtual bool setTempAndFan() {
         return false;
     }

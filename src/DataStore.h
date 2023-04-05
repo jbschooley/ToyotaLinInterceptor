@@ -1,6 +1,9 @@
-//
-// Created by Jacob on 1/23/2023.
-//
+/**
+ * Stores data received from the car and the panel and handles
+ * reading and writing to EEPROM.
+ *
+ * @author Jacob Schooley
+ */
 
 #ifndef TOYOTALININTERCEPTOR_DATASTORE_H
 #define TOYOTALININTERCEPTOR_DATASTORE_H
@@ -40,6 +43,11 @@ public:
         readPresetFromEEPROM();
     }
 
+    /**
+     * Save the provided frame to a data array.
+     * @param id     ID of frame
+     * @param frame  frame data
+     */
     void saveFrame(uint8_t id, uint8_t* frame) {
         // write to data store
         switch (id) {
@@ -69,6 +77,12 @@ public:
         }
     }
 
+    /**
+     * Get a frame from the data store. If buttons have been modified, return
+     * the modified buttons frame only once.
+     * @param id  ID of frame
+     * @return    frame data
+     */
     uint8_t* getFrame(uint8_t id) {
         // read from data store
         switch (id) {
@@ -97,32 +111,61 @@ public:
         }
     }
 
+    /**
+     * Save the selected preset mode to EEPROM.
+     */
     void savePresetToEEPROM() const {
         EEPROM.update(presetEnabledAddress, presetEnabled);
         EEPROM.update(presetModeAddress, presetMode);
     }
 
+    /**
+     * Read the selected preset mode from EEPROM.
+     */
     void readPresetFromEEPROM() {
         presetEnabled = EEPROM.read(presetEnabledAddress);
         presetMode = EEPROM.read(presetModeAddress);
     }
 
+    /**
+     * @param id
+     * @return true if the provided ID is a data frame
+     */
     static bool idIsData(uint8_t id) {
         return id == 0xb1 || id == 0x32 || id == 0xf5;
     }
 
+    /**
+     * @param id
+     * @return true if the provided ID is a request frame
+     */
     static bool idIsRequest(uint8_t id) {
         return id == 0x39 || id == 0xba; // || id == 0x78;
     }
 
+    /**
+     * @param id
+     * @return true if the provided ID is a data frame containing display data
+     * to be sent to the panel
+     */
     static bool idIsDataPanel(uint8_t id) {
         return id == 0xb1;
     }
 
+    /**
+     * @param id
+     * @return true if the provided ID is a request frame to retrieve button
+     * data from the panel
+     */
     static bool idIsRequestPanel(uint8_t id) {
         return id == 0x39;
     }
 
+    /**
+     * Build a string representation of a frame.
+     * @param frame
+     * @return string containing all bytes in the frame
+     */
     static String frameToString(const uint8_t* frame) {
         String s = "";
         for (int i = 0; i < 8; i++) {

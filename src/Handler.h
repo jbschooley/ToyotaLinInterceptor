@@ -1,6 +1,9 @@
-//
-// Created by Jacob on 1/9/2023.
-//
+/**
+ * Handles state for reading and writing messages on the LIN bus and
+ * ensures received messages are validated before being processed.
+ *
+ * @author Jacob Schooley
+ */
 
 #ifndef TOYOTALININTERCEPTOR_HANDLER_H
 #define TOYOTALININTERCEPTOR_HANDLER_H
@@ -35,6 +38,12 @@ protected:
 
 public:
 
+    /**
+     * @param ds    data store
+     * @param mod   modifier
+     * @param ser   serial port
+     * @param l     logger
+     */
     explicit Handler(DataStore* ds, Modifier* mod, HardwareSerial* ser, Logger* l) {
         this->l = l;
         this->ds = ds;
@@ -42,12 +51,17 @@ public:
         this->lin = new LINController(ser);
     }
 
+    /**
+     * Set state back to IDLE at the end of a frame or if corrupt data
+     * is received.
+     */
     void reset() {
         state = IDLE;
     }
 
-//    virtual void handleByte(const uint8_t* b) {}
-
+    /**
+     * Reads available bytes from the input stream and handles them.
+     */
     void handleRead() {
         while (lin->available()) {
             uint8_t b = lin->read();
@@ -55,6 +69,30 @@ public:
         }
     }
 
+    /**
+     * Handles a single byte from the input stream. If it is part of a frame,
+     * it will be stored in currFrame.
+     *
+     * A frame follows the format:
+     * 0x55 ID BYTE_0 BYTE_1 BYTE_2 BYTE_3 BYTE_4 BYTE_5 BYTE_6 BYTE_7 CHECKSUM
+     *
+     * Receipt of the 0x55 sync byte starts the frame. When the ID is received,
+     * the onReceiveID() method is called. This is used to determine if the
+     * message is a request or data. If it is a request, the response is sent
+     * and the state is reset. If it is data, the state is changed to
+     * WAIT_BYTE_0 and the data is stored in currFrame.
+     *
+     * When all bytes of a data frame have been received, the checksum is
+     * validated. If it is valid, onReceiveData() is called to process the data.
+     * If it is invalid, the frame is ignored. The state is reset to IDLE.
+     *
+     * The same code can be used for reading messages as both the Commander and
+     * Responder. This is because when the Commander sends an ID to request
+     * data, that ID is fed back into the input stream as the first byte of
+     * the response.
+     *
+     * @param b the byte to handle
+     */
     void handleByte(const uint8_t* b) {
         switch (state) {
             case IDLE:
@@ -138,7 +176,15 @@ public:
         }
     }
 
+    /**
+     * Used to determine if the message is a request or data and to
+     * send a response if it is a request.
+     */
     virtual void onReceiveID() {}
+
+    /**
+     * Used to process data after it has been received and validated.
+     */
     virtual void onReceiveData() {}
 
 };

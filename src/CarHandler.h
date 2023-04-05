@@ -1,6 +1,8 @@
-//
-// Created by Jacob on 1/23/2023.
-//
+/**
+ * Handles reading, forwarding, and responding to messages from the car.
+ *
+ * @author Jacob Schooley
+ */
 
 #ifndef TOYOTALININTERCEPTOR_CARHANDLER_H
 #define TOYOTALININTERCEPTOR_CARHANDLER_H
@@ -17,6 +19,15 @@ private:
 public:
     PanelHandler* panelHandler{};
 
+    /**
+     * @param ds            data store
+     * @param mod           modifier
+     * @param menu          the Menu object
+     * @param toggle        the Toggle object
+     * @param offButton     the OffButton object
+     * @param pc            PresetController
+     * @param ser           serial port
+     */
     explicit CarHandler(DataStore* ds, Modifier* mod, Menu* menu, Toggle* toggle, OffButton* offButton, PresetController* pc, HardwareSerial* ser)
             : Handler(ds, mod, ser, new Logger("Car", false)) {
         this->menu = menu;
@@ -25,6 +36,15 @@ public:
         this->pc = pc;
     }
 
+    /**
+     * When an ID is received, check if it is a data or request.
+     *
+     * If data, go to next state.
+     *
+     * If request, send response and go back to idle.
+     *
+     * If neither (unrecognized/ignored ID), go back to idle.
+     */
     void onReceiveID() override {
         if (DataStore::idIsData(currID)) {
             // if data, go to next state
@@ -43,6 +63,10 @@ public:
         if (currID == 0x78) panelHandler->sendMsg(0x39);
     }
 
+    /**
+     * If climate status is received, process buttons to modify display
+     * and forward to panel. Also, ensure the
+     */
     void onReceiveData() override {
         // if car sent climate status, forward to panel
         if (currID == 0xb1) {
@@ -59,7 +83,7 @@ public:
             offButton->run();
             panelHandler->sendMsg(currID);
             // TODO modify buttons after climate status received
-            pc->presetAfter1s();
+            pc->presetDelay();
         }
     }
 

@@ -1,6 +1,8 @@
-//
-// Created by Jacob on 1/24/2023.
-//
+/**
+ * Sends data and requests and handles responses from the climate control panel.
+ *
+ * @author Jacob Schooley
+ */
 
 #ifndef TOYOTALININTERCEPTOR_PANELHANDLER_H
 #define TOYOTALININTERCEPTOR_PANELHANDLER_H
@@ -10,9 +12,20 @@
 class PanelHandler : public Handler {
 public:
 
+    /**
+     * @param ds    data store
+     * @param mod   modifier
+     * @param ser   serial port
+     */
     explicit PanelHandler(DataStore* ds, Modifier* mod, HardwareSerial* ser)
             : Handler(ds, mod, ser, new Logger("Panel", false)) {}
 
+    /**
+     * Sends a message to the panel. Used by CarHandler to trigger a display
+     * update or request button status.
+     * @param id ID of message to send. If data, sends data from DataStore.
+     *           If request, sends ID.
+     */
     void sendMsg(uint8_t id) {
         // send message
         if (DataStore::idIsDataPanel(id)) {
@@ -34,6 +47,10 @@ public:
         }
     }
 
+    /**
+     * When an ID is received, check if it is a known request. If so, begin
+     * listening for response data. If not, go back to idle.
+     */
     void onReceiveID() override {
         if (DataStore::idIsRequest(currID)) {
             // if expecting response, go to next state
