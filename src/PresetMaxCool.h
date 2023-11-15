@@ -6,18 +6,14 @@
  * @author Jacob Schooley
  */
 
-#ifndef TOYOTALININTERCEPTOR_PRESETMAXDEFROST_H
-#define TOYOTALININTERCEPTOR_PRESETMAXDEFROST_H
+#ifndef TOYOTALININTERCEPTOR_PRESETMAXCOOL_H
+#define TOYOTALININTERCEPTOR_PRESETMAXCOOL_H
 
 #include "Preset.h"
 
-class PresetMaxDefrost : public Preset {
+class PresetMaxCool : public Preset {
 private:
     void setButtons() override {
-        // defrost
-        if (!mod->statusFrontDefrost()) { mod->pressButton(mod->BUTTON_FRONT_DEFROST); }
-        if (!mod->statusRearDefrost()) { mod->pressButton(mod->BUTTON_REAR_DEFROST); }
-
         // sync on
         if (!mod->statusSync()) { mod->pressButton(mod->BUTTON_SYNC); }
 
@@ -36,7 +32,7 @@ private:
         bool settingsChangedThisRound = false;
 
         // temp
-        settingsChangedThisRound |= mod->setTemp(mod->ZONE_DRIVER, mod->TEMP_HI);
+        settingsChangedThisRound |= mod->setTemp(mod->ZONE_DRIVER, mod->TEMP_LO);
 
         // fan speed
         settingsChangedThisRound |= mod->setFan(7);
@@ -45,7 +41,7 @@ private:
     }
 
 public:
-    explicit PresetMaxDefrost(Modifier* mod) : Preset(mod) {}
+    explicit PresetMaxCool(Modifier* mod) : Preset(mod) {}
 };
 
-#endif //TOYOTALININTERCEPTOR_PRESETMAXDEFROST_H
+#endif //TOYOTALININTERCEPTOR_PRESETMAXCOOL_H

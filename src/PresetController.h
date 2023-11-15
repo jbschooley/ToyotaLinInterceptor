@@ -10,7 +10,8 @@
 
 #include "Preset.h"
 #include "PresetTesting.h"
-#include "PresetMaxDefrost.h"
+#include "PresetMaxHeatDefrost.h"
+#include "PresetMaxCool.h"
 
 class PresetController {
 private:
@@ -35,16 +36,20 @@ public:
 
     /**
      * Set the preset determined by the value in presetMode.\n
-     * 1 = MaxDefrost\n
-     * 2 = Testing\n
+     * 1 = MaxHeatDefrost\n
+     * 2 = MaxCool\n
+     * 3 = Testing\n
      */
     void setPresetFromMode() {
         l->log("Preset " + String(ds->presetMode) + " selected");
         switch (ds->presetMode) {
             case 1:
-                preset = new PresetMaxDefrost(mod);
+                preset = new PresetMaxHeatDefrost(mod);
                 break;
             case 2:
+                preset = new PresetMaxCool(mod);
+                break;
+            case 3:
                 preset = new PresetTesting(mod);
                 break;
             default:
