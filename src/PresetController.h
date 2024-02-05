@@ -64,7 +64,7 @@ public:
      */
     void presetDelay() {
         // TODO check for remote start here
-        if (millis() > 2000 && ds->presetEnabled) {
+        if (millis() > 3000 && ds->presetEnabled) {
             activatePreset();
         }
     }

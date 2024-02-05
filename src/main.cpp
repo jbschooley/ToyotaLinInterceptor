@@ -2,7 +2,6 @@
 #include <HardwareSerial.h>
 #include "LINController.h"
 #include "Logger.h"
-#include "Timer.h"
 #include "DataStore.h"
 #include "Modifier.h"
 #include "PresetController.h"
@@ -17,8 +16,8 @@
 #define SerialCar Serial1
 #define SerialPanel Serial2
 
-#define PinEnPanel 53
-#define PinEnCar 46
+#define PinEnCar 53
+#define PinEnPanel 46
 
 //unsigned long baud = 19200;
 
@@ -52,10 +51,10 @@ void setup() {
     carHandler->panelHandler = panelHandler;
 
     // enable lin chips
-    pinMode(PinEnPanel, OUTPUT);
-    digitalWrite(PinEnPanel, HIGH);
     pinMode(PinEnCar, OUTPUT);
     digitalWrite(PinEnCar, HIGH);
+    pinMode(PinEnPanel, OUTPUT);
+    digitalWrite(PinEnPanel, HIGH);
 
     l->log("end setup");
 
